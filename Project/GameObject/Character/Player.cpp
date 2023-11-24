@@ -25,17 +25,6 @@ void Player::Initialize(const std::vector<Model*>& models) {
 }
 
 void Player::Update() {
-	//当たった瞬間に親子付けする
-	if (preOnCollision_ == false && onCollision_ == true) {
-		worldTransform_.SetParent(parent_);
-	}
-
-	//離れた瞬間に親子付けを外す
-	if (preOnCollision_ == true && onCollision_ == false) {
-		worldTransform_.UnsetParent();
-	}
-
-
 	//Behaviorの遷移処理
 	if (behaviorRequest_) {
 		//振る舞いを変更する
@@ -51,6 +40,9 @@ void Player::Update() {
 			break;
 		case Behavior::kAttack:
 			BehaviorAttackInitialize();
+			break;
+		case Behavior::kJump:
+			BehaviorJumpInitialize();
 			break;
 		}
 		behaviorRequest_ = std::nullopt;
@@ -69,19 +61,18 @@ void Player::Update() {
 	case Behavior::kAttack:
 		BehaviorAttackUpdate();
 		break;
+	case Behavior::kJump:
+		BehaviorJumpUpdate();
+		break;
 	}
-
 
 	//当たっていないときは落ちる
 	if (onCollision_ == false) {
 		worldTransform_.translation_.y -= 0.1f;
 	}
-	else {
-		worldTransform_.translation_.y = 0.0f;
-	}
 
 	//落ちたらリスタート
-	if (worldTransform_.translation_.y <= -5.0f) {
+	if (worldTransform_.translation_.y <= -10.0f) {
 		Restart();
 	}
 
@@ -142,7 +133,7 @@ void Player::OnCollision(Collider* collider) {
 Vector3 Player::GetWorldPosition() {
 	Vector3 pos{};
 	pos.x = worldTransform_.matWorld_.m[3][0];
-	pos.y = worldTransform_.matWorld_.m[3][1];
+	pos.y = worldTransform_.matWorld_.m[3][1] + 1.0f;
 	pos.z = worldTransform_.matWorld_.m[3][2];
 	return pos;
 }
@@ -166,14 +157,14 @@ void Player::BehaviorRootUpdate() {
 		bool isMoving = false;
 
 		//移動量
-		Vector3 move = {
+		velocity_ = {
 			(float)joyState.Gamepad.sThumbLX / SHRT_MAX,
 			0.0f,
 			(float)joyState.Gamepad.sThumbLY / SHRT_MAX,
 		};
 
 		//スティックの押し込みが遊び範囲を超えていたら移動フラグをtrueにする
-		if (Length(move) > threshold) {
+		if (Length(velocity_) > threshold) {
 			isMoving = true;
 		}
 
@@ -183,19 +174,19 @@ void Player::BehaviorRootUpdate() {
 			const float speed = 0.3f;
 
 			//移動量に速さを反映
-			move = Multiply(Normalize(move), speed);
+			velocity_ = Multiply(Normalize(velocity_), speed);
 
 			//移動ベクトルをカメラの角度だけ回転する
 			Matrix4x4 rotateMatrix = MakeRotateYMatrix(camera_->rotation_.y);
-			move = TransformNormal(move, rotateMatrix);
+			velocity_ = TransformNormal(velocity_, rotateMatrix);
 
 			//移動
-			worldTransform_.translation_ = Add(worldTransform_.translation_, move);
+			worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
 
 			//回転
-			move = Normalize(move);
-			Vector3 cross = Normalize(Cross({ 0.0f,0.0f,1.0f }, move));
-			float dot = Dot({ 0.0f,0.0f,1.0f }, move);
+			Vector3 nVelocity_ = Normalize(velocity_);
+			Vector3 cross = Normalize(Cross({ 0.0f,0.0f,1.0f }, nVelocity_));
+			float dot = Dot({ 0.0f,0.0f,1.0f }, nVelocity_);
 			moveQuaternion_ = MakeRotateAxisAngleQuaternion(cross, std::acos(dot));
 		}
 	}
@@ -215,10 +206,17 @@ void Player::BehaviorRootUpdate() {
 	}
 
 	if (input_->GetJoystickState(joyState)) {
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) {
 			if (workDash_.coolTime == behaviorDashCoolTime) {
 				behaviorRequest_ = Behavior::kDash;
 			}
+		}
+	}
+
+	//ジャンプ行動に変更
+	if (input_->GetJoystickState(joyState)) {
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+			behaviorRequest_ = Behavior::kJump;
 		}
 	}
 }
@@ -269,6 +267,25 @@ void Player::BehaviorAttackUpdate() {
 	//攻撃が終わったら通常状態に戻す
 	if (weapon_->GetIsAttack() == false) {
 		behaviorRequest_ = Behavior::kRoot;
+	}
+}
+
+void Player::BehaviorJumpInitialize() {
+	worldTransform_.translation_.y = 0.0f;
+	const float kJumpFirstSpeed = 1.0f;
+	velocity_.y = kJumpFirstSpeed;
+	worldTransform_.UnsetParent();
+}
+
+void Player::BehaviorJumpUpdate() {
+	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
+	const float kGravityAcceleration = 0.05f;
+	Vector3 accelerationVector = { 0.0f,-kGravityAcceleration,0.0f };
+	velocity_ = Add(velocity_, accelerationVector);
+
+	if (worldTransform_.parent_) {
+		behaviorRequest_ = Behavior::kRoot;
+		worldTransform_.translation_.y = 0.0f;
 	}
 }
 

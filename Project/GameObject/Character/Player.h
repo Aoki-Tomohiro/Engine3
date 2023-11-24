@@ -16,6 +16,7 @@ public:
 		kRoot,//通常状態
 		kDash,//ダッシュ状態
 		kAttack,//攻撃状態
+		kJump,//ジャンプ中
 	};
 
 	//ダッシュ用ワーク
@@ -115,6 +116,16 @@ private:
 	void BehaviorAttackUpdate();
 
 	/// <summary>
+	/// ジャンプ行動初期化
+	/// </summary>
+	void BehaviorJumpInitialize();
+
+	/// <summary>
+	/// ジャンプ行動更新
+	/// </summary>
+	void BehaviorJumpUpdate();
+
+	/// <summary>
 	/// グローバル変数の適応
 	/// </summary>
 	void ApplyGlobalVariables();
@@ -143,4 +154,6 @@ private:
 	int behaviorDashTime_ = 10;
 	//クォータニオン
 	Quaternion moveQuaternion_{ 0.0f,0.0f,0.0f,1.0f };
+	//速度
+	Vector3 velocity_{};
 };
