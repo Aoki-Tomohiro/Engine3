@@ -1,8 +1,22 @@
 #pragma once
 #include "Engine/Framework/Scene/IScene.h"
+#include "Engine/Base/Renderer/Renderer.h"
+#include "Engine/3D/Model/Model.h"
+#include "Engine/3D/Camera/Camera.h"
+#include "Engine/Components/CollisionManager/CollisionManager.h"
+
+#include "Project/GameObject/Character/Player.h"
+#include "Project/GameObject/Character/Enemy.h"
+#include "Project/GameObject/Skydome/Skydome.h"
+#include "Project/GameObject/FollowCamera/FollowCamera.h"
+#include "Project/GameObject/Floor/Floor.h"
+#include "Project/GameObject/Goal/Goal.h"
 
 class GameScene : public IScene {
 public:
+	//床の数
+	static const int kFloorMax = 5;
+
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
@@ -29,6 +43,31 @@ public:
 	void DrawUI() override;
 
 private:
-
+	//Renderer
+	Renderer* renderer_ = nullptr;
+	//カメラ
+	Camera camera_{};
+	//衝突マネージャー
+	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
+	//プレイヤー
+	std::unique_ptr<Model> playerModel_ = nullptr;
+	std::unique_ptr<Player> player_ = nullptr;
+	//敵
+	std::unique_ptr<Model> modelEnemyBody_ = nullptr;
+	std::unique_ptr<Model> modelEnemyL_arm_ = nullptr;
+	std::unique_ptr<Model> modelEnemyR_arm_ = nullptr;
+	//敵キャラ
+	std::unique_ptr<Enemy> enemy_ = nullptr;
+	//天球
+	std::unique_ptr<Model> skydomeModel_ = nullptr;
+	std::unique_ptr<Skydome> skydome_ = nullptr;
+	//追従カメラ
+	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
+	//床
+	std::unique_ptr<Model> floorModel_ = nullptr;
+	std::vector<std::unique_ptr<Floor>> floors_{};
+	//ゴール
+	std::unique_ptr<Model> goalModel_ = nullptr;
+	std::unique_ptr<Goal> goal_ = nullptr;
 };
 

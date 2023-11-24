@@ -202,6 +202,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utilities\Log.cpp" />
     <ClCompile Include="Engine\Utilities\RandomGenerator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Project\GameObject\Character\BaseCharacter.cpp" />
+    <ClCompile Include="Project\GameObject\Character\Enemy.cpp" />
+    <ClCompile Include="Project\GameObject\Character\Player.cpp" />
+    <ClCompile Include="Project\GameObject\Floor\Floor.cpp" />
+    <ClCompile Include="Project\GameObject\FollowCamera\FollowCamera.cpp" />
+    <ClCompile Include="Project\GameObject\Goal\Goal.cpp" />
+    <ClCompile Include="Project\GameObject\Skydome\Skydome.cpp" />
     <ClCompile Include="Project\Game\GameManager.cpp" />
     <ClCompile Include="Project\Scene\GameScene.cpp" />
     <ClCompile Include="Project\Scene\SceneFactory.cpp" />
@@ -263,6 +270,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utilities\GlobalVariables.h" />
     <ClInclude Include="Engine\Utilities\Log.h" />
     <ClInclude Include="Engine\Utilities\RandomGenerator.h" />
+    <ClInclude Include="Project\GameObject\Character\BaseCharacter.h" />
+    <ClInclude Include="Project\GameObject\Character\Enemy.h" />
+    <ClInclude Include="Project\GameObject\Character\Player.h" />
+    <ClInclude Include="Project\GameObject\Floor\Floor.h" />
+    <ClInclude Include="Project\GameObject\FollowCamera\FollowCamera.h" />
+    <ClInclude Include="Project\GameObject\Goal\Goal.h" />
+    <ClInclude Include="Project\GameObject\Skydome\Skydome.h" />
     <ClInclude Include="Project\Game\GameManager.h" />
     <ClInclude Include="Project\Scene\GameScene.h" />
     <ClInclude Include="Project\Scene\SceneFactory.h" />
