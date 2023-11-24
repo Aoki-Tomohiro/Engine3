@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "Engine/Base/ImGuiManager/ImGuiManager.h"
 
 void Enemy::Initialize(const std::vector<Model*>& models) {
 	//基底クラスの初期化
@@ -72,7 +73,9 @@ void Enemy::UpdateFloatingGimmick() {
 }
 
 void Enemy::OnCollision(Collider* collider) {
-
+	if (collider->GetCollisionAttribute() & kCollisionAttributeWeapon) {
+		isDead_ = true;
+	}
 }
 
 Vector3 Enemy::GetWorldPosition() {

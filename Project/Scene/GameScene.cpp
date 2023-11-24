@@ -16,7 +16,8 @@ void GameScene::Initialize() {
 
 	//プレイヤーの作成
 	playerModel_.reset(Model::CreateFromOBJ("Resources/Models/Player", "Player.obj"));
-	std::vector<Model*> playerModels = { playerModel_.get() };
+	weaponModel_.reset(Model::CreateFromOBJ("Resources/Models/Weapon", "Weapon.obj"));
+	std::vector<Model*> playerModels = { playerModel_.get(),weaponModel_.get() };
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels);
 	player_->SetCamera(&camera_);
@@ -90,7 +91,12 @@ void GameScene::Update() {
 	//衝突判定
 	collisionManager_->ClearColliderList();
 	collisionManager_->SetColliderList(player_.get());
-	collisionManager_->SetColliderList(enemy_.get());
+	if (player_->GetWeapon()->GetIsHit()) {
+		collisionManager_->SetColliderList(player_->GetWeapon());
+	}
+	if (enemy_->GetIsDead() == false) {
+		collisionManager_->SetColliderList(enemy_.get());
+	}
 	for (std::unique_ptr<Floor>& floor : floors_) {
 		collisionManager_->SetColliderList(floor.get());
 	}
@@ -106,7 +112,9 @@ void GameScene::Draw() {
 	player_->Draw(camera_);
 
 	//敵の描画
-	enemy_->Draw(camera_);
+	if (enemy_->GetIsDead() == false) {
+		enemy_->Draw(camera_);
+	}
 
 	//天球の描画
 	skydome_->Draw(camera_);

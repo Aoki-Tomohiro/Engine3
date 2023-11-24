@@ -1,6 +1,6 @@
 #include "BaseCharacter.h"
 
-void BaseCharacter::Initialize(const std::vector<Model*>& models){ 
+void BaseCharacter::Initialize(const std::vector<Model*>& models) {
 	models_ = models;
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();

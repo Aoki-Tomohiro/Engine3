@@ -4,7 +4,7 @@
 #include "Engine/Math/MathFunction.h"
 #include "Engine/Components/CollisionManager/Collider.h"
 
-class Floor : public Collider{
+class Floor : public Collider {
 public:
 	/// <summary>
 	/// 初期化

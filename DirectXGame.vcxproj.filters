@@ -214,9 +214,6 @@
     <Filter Include="ヘッダー ファイル\Project\GameObject\FollowCamera">
       <UniqueIdentifier>{0cc18823-bc66-48f6-baab-49d139afa7a4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Project\GameObject\FollowCamera">
-      <UniqueIdentifier>{0f1f7787-2f85-4807-bf9e-4a7138cc06df}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\Project\GameObject\Goal">
       <UniqueIdentifier>{c0243091-951e-4984-ace3-6274e9694acf}</UniqueIdentifier>
     </Filter>
@@ -231,6 +228,15 @@
     </Filter>
     <Filter Include="ソース ファイル\Project\GameObject\Skydome">
       <UniqueIdentifier>{5dc49b92-ff3c-4b78-a2a7-073483a09f1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Project\GameObject\FollowCamera">
+      <UniqueIdentifier>{0f1f7787-2f85-4807-bf9e-4a7138cc06df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Project\GameObject\Weapon">
+      <UniqueIdentifier>{47fa1a48-7e0a-4c65-95df-a2c96ce36466}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Project\GameObject\Weapon">
+      <UniqueIdentifier>{e3e84b8f-6d70-4678-b555-34046338c8d7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -389,6 +395,9 @@
     </ClCompile>
     <ClCompile Include="Project\GameObject\Skydome\Skydome.cpp">
       <Filter>ソース ファイル\Project\GameObject\Skydome</Filter>
+    </ClCompile>
+    <ClCompile Include="Project\GameObject\Weapon\Weapon.cpp">
+      <Filter>ソース ファイル\Project\GameObject\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -589,6 +598,9 @@
     </ClInclude>
     <ClInclude Include="Project\GameObject\Skydome\Skydome.h">
       <Filter>ヘッダー ファイル\Project\GameObject\Skydome</Filter>
+    </ClInclude>
+    <ClInclude Include="Project\GameObject\Weapon\Weapon.h">
+      <Filter>ヘッダー ファイル\Project\GameObject\Weapon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

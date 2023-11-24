@@ -51,6 +51,7 @@ private:
 	std::unique_ptr<CollisionManager> collisionManager_ = nullptr;
 	//プレイヤー
 	std::unique_ptr<Model> playerModel_ = nullptr;
+	std::unique_ptr<Model> weaponModel_ = nullptr;
 	std::unique_ptr<Player> player_ = nullptr;
 	//敵
 	std::unique_ptr<Model> modelEnemyBody_ = nullptr;
