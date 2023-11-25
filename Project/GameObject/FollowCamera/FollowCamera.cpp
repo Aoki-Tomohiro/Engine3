@@ -25,10 +25,8 @@ void FollowCamera::Update() {
 	//カメラ座標
 	camera_.translation_ = Add(interTarget_, offset);
 
-	XINPUT_STATE joyState{};
-
 	//旋回操作
-	if (Input::GetInstance()->GetJoystickState(joyState)) {
+	if (Input::GetInstance()->IsControllerConnected()) {
 
 		//しきい値
 		const float threshold = 0.7f;
@@ -38,8 +36,8 @@ void FollowCamera::Update() {
 
 		//回転量
 		Vector3 rotation = {
-			(float)joyState.Gamepad.sThumbRY / SHRT_MAX,
-			(float)joyState.Gamepad.sThumbRX / SHRT_MAX,
+			Input::GetInstance()->GetRightStickY(),
+			Input::GetInstance()->GetRightStickX(),
 			0.0f
 		};
 

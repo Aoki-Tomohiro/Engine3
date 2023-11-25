@@ -91,7 +91,7 @@ void GameScene::Update() {
 	//衝突判定
 	collisionManager_->ClearColliderList();
 	collisionManager_->SetColliderList(player_.get());
-	if (player_->GetWeapon()->GetIsHit()) {
+	if (player_->GetWeapon()->GetIsAttack()) {
 		collisionManager_->SetColliderList(player_->GetWeapon());
 	}
 	if (enemy_->GetIsDead() == false) {

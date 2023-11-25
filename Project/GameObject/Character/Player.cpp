@@ -3,9 +3,19 @@
 #include <cassert>
 #include <numbers>
 
+//コンボ定数表
+const std::array<Player::ConstAttack, Player::ComboNum> Player::kConstAttacks_ = {
+	{
+		{ 0, 0, 20, 0, 0.0f, 0.0f, 0.14f},
+	    { 15, 10, 15, 0, -0.04f, 0.0f, 0.2f },
+	    { 15, 10, 15, 30, -0.04f, 0.0f, 0.2f },
+	}
+};
+
 void Player::Initialize(const std::vector<Model*>& models) {
 	//基底クラスの初期化
 	BaseCharacter::Initialize(models);
+
 	//入力クラスのインスタンスを取得
 	input_ = Input::GetInstance();
 	//武器の作成
@@ -146,9 +156,7 @@ void Player::BehaviorRootUpdate() {
 	//ダッシュのクールタイム
 	const uint32_t behaviorDashCoolTime = 60;
 
-	XINPUT_STATE joyState{};
-
-	if (input_->GetJoystickState(joyState)) {
+	if (input_->IsControllerConnected()) {
 
 		//しきい値
 		const float threshold = 0.7f;
@@ -158,9 +166,9 @@ void Player::BehaviorRootUpdate() {
 
 		//移動量
 		velocity_ = {
-			(float)joyState.Gamepad.sThumbLX / SHRT_MAX,
+			input_->GetLeftStickX(),
 			0.0f,
-			(float)joyState.Gamepad.sThumbLY / SHRT_MAX,
+			input_->GetLeftStickY(),
 		};
 
 		//スティックの押し込みが遊び範囲を超えていたら移動フラグをtrueにする
@@ -192,8 +200,8 @@ void Player::BehaviorRootUpdate() {
 	}
 
 	//攻撃行動に変更
-	if (input_->GetJoystickState(joyState)) {
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+	if (input_->IsControllerConnected()) {
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER)){
 			if (workDash_.coolTime == behaviorDashCoolTime) {
 				behaviorRequest_ = Behavior::kAttack;
 			}
@@ -205,8 +213,8 @@ void Player::BehaviorRootUpdate() {
 		workDash_.coolTime++;
 	}
 
-	if (input_->GetJoystickState(joyState)) {
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_X) {
+	if (input_->IsControllerConnected()) {
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_X)) {
 			if (workDash_.coolTime == behaviorDashCoolTime) {
 				behaviorRequest_ = Behavior::kDash;
 			}
@@ -214,8 +222,8 @@ void Player::BehaviorRootUpdate() {
 	}
 
 	//ジャンプ行動に変更
-	if (input_->GetJoystickState(joyState)) {
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+	if (input_->IsControllerConnected()) {
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_A)) {
 			behaviorRequest_ = Behavior::kJump;
 		}
 	}
@@ -228,17 +236,14 @@ void Player::BehaviorDashInitialize() {
 }
 
 void Player::BehaviorDashUpdate() {
-
-	XINPUT_STATE joyState{};
-
-	if (input_->GetJoystickState(joyState)) {
+	if (input_->IsControllerConnected()) {
 		//速さ
 		float kSpeed = 1.0f;
 		//移動量
 		Vector3 move = {
-			(float)joyState.Gamepad.sThumbLX / SHRT_MAX,
+			input_->GetLeftStickX(),
 			0.0f,
-			(float)joyState.Gamepad.sThumbLY / SHRT_MAX,
+			input_->GetLeftStickY(),
 		};
 
 		//移動量に速さを反映
@@ -254,18 +259,6 @@ void Player::BehaviorDashUpdate() {
 
 	//規定の時間経過で通常行動に戻る
 	if (++workDash_.dashParameter_ >= behaviorDashTime_) {
-		behaviorRequest_ = Behavior::kRoot;
-	}
-}
-
-void Player::BehaviorAttackInitialize() {
-	//攻撃開始
-	weapon_->Attack();
-}
-
-void Player::BehaviorAttackUpdate() {
-	//攻撃が終わったら通常状態に戻す
-	if (weapon_->GetIsAttack() == false) {
 		behaviorRequest_ = Behavior::kRoot;
 	}
 }
@@ -286,6 +279,120 @@ void Player::BehaviorJumpUpdate() {
 	if (worldTransform_.parent_) {
 		behaviorRequest_ = Behavior::kRoot;
 		worldTransform_.translation_.y = 0.0f;
+	}
+}
+
+void Player::BehaviorAttackInitialize() {
+	//攻撃用の変数を初期化
+	workAttack_.attackParameter = 0;
+	workAttack_.comboIndex = 0;
+	workAttack_.inComboPhase = 0;
+	workAttack_.comboNext = false;
+	workAttack_.translation = { 0.0f,0.0f,0.0f };
+	workAttack_.rotation = { 0.0f,0.0f,0.0f };
+}
+
+void Player::BehaviorAttackUpdate() {
+	//コンボ上限に達していない
+	if (workAttack_.comboIndex < ComboNum - 1) {
+		if (input_->IsControllerConnected()) {
+			//攻撃ボタンをトリガーしたら
+			if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_SHOULDER)) {
+				//コンボ有効
+				workAttack_.comboNext = true;
+			}
+		}
+	}
+
+	//攻撃の合計時間
+	uint32_t totalTime = kConstAttacks_[workAttack_.comboIndex].anticipationTime + kConstAttacks_[workAttack_.comboIndex].chargeTime + kConstAttacks_[workAttack_.comboIndex].swingTime + kConstAttacks_[workAttack_.comboIndex].recoveryTime;
+	//既定の時間経過で通常行動に戻る
+	if (++workAttack_.attackParameter >= totalTime) {
+		//コンボ継続なら次のコンボに進む
+		if (workAttack_.comboNext) {
+			//コンボ継続フラグをリセット
+			workAttack_.comboNext = false;
+			workAttack_.attackParameter = 0;
+			workAttack_.comboIndex++;
+			weapon_->SetIsAttack(false);
+			switch (workAttack_.comboIndex) {
+			case 0:
+				workAttack_.translation = { 0.0f,0.8f,0.0f };
+				workAttack_.rotation = { 0.0f,0.0f,0.0f };
+				break;
+			case 1:
+				workAttack_.translation = { 0.0f,0.8f,0.0f };
+				workAttack_.rotation = { 1.0f,0.0f,3.14f / 2.0f };
+				break;
+			case 2:
+				workAttack_.translation = { 0.0f,0.8f,0.0f };
+				workAttack_.rotation = { 0.0f,0.0f,0.0f };
+				break;
+			}
+		}
+		//コンボ継続でないなら攻撃を終了してルートビヘイビアに戻る
+		else {
+			behaviorRequest_ = Behavior::kRoot;
+		}
+	}
+
+	uint32_t anticipationTime = kConstAttacks_[workAttack_.comboIndex].anticipationTime;
+	uint32_t chargeTime = kConstAttacks_[workAttack_.comboIndex].anticipationTime + kConstAttacks_[workAttack_.comboIndex].chargeTime;
+	uint32_t swingTime = kConstAttacks_[workAttack_.comboIndex].anticipationTime + kConstAttacks_[workAttack_.comboIndex].chargeTime + kConstAttacks_[workAttack_.comboIndex].swingTime;
+
+	//コンボ攻撃によってモーションを分岐
+	switch (workAttack_.comboIndex) {
+	case 0:
+		if (workAttack_.attackParameter < anticipationTime) {
+			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].anticipationSpeed;
+		}
+		
+		if (workAttack_.attackParameter >= anticipationTime && workAttack_.attackParameter < chargeTime) {
+			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].chargeSpeed;
+		}
+		
+		if (workAttack_.attackParameter >= chargeTime && workAttack_.attackParameter < swingTime) {
+			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].swingSpeed;
+			weapon_->SetIsAttack(true);
+		}
+
+		weapon_->SetTranslation(workAttack_.translation);
+		weapon_->SetRotation(workAttack_.rotation);
+		break;
+	case 1:
+		if (workAttack_.attackParameter < anticipationTime) {
+			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].anticipationSpeed;
+		}
+		
+		if (workAttack_.attackParameter >= anticipationTime && workAttack_.attackParameter < chargeTime) {
+			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].chargeSpeed;
+		}
+		
+		if (workAttack_.attackParameter >= chargeTime && workAttack_.attackParameter < swingTime) {
+			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].swingSpeed;
+			weapon_->SetIsAttack(true);
+		}
+
+		weapon_->SetTranslation(workAttack_.translation);
+		weapon_->SetRotation(workAttack_.rotation);
+		break;
+	case 2:
+		if (workAttack_.attackParameter < anticipationTime) {
+			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].anticipationSpeed;
+		}
+
+		if (workAttack_.attackParameter >= anticipationTime && workAttack_.attackParameter < chargeTime) {
+			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].chargeSpeed;
+		}
+		
+		if (workAttack_.attackParameter >= chargeTime && workAttack_.attackParameter < swingTime) {
+			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].swingSpeed;
+			weapon_->SetIsAttack(true);
+		}
+
+		weapon_->SetTranslation(workAttack_.translation);
+		weapon_->SetRotation(workAttack_.rotation);
+		break;
 	}
 }
 

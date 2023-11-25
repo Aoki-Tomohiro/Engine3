@@ -26,6 +26,38 @@ public:
 		uint32_t coolTime = 0;
 	};
 
+	//攻撃用ワーク
+	struct WorkAttack {
+		//攻撃ギミックの媒介変数
+		Vector3 translation{};
+		Vector3 rotation{};
+		uint32_t attackParameter = 0;
+		int32_t comboIndex = 0;
+		int32_t inComboPhase = 0;
+		bool comboNext = false;
+	};
+
+	//コンボの数
+	static const int ComboNum = 3;
+
+	//攻撃用定数
+	struct ConstAttack {
+		//振りかぶりの時間
+		uint32_t anticipationTime;
+		//ための時間
+		uint32_t chargeTime;
+		//攻撃振りの時間
+		uint32_t swingTime;
+		//硬直時間
+		uint32_t recoveryTime;
+		//振りかぶりの移動速さ
+		float anticipationSpeed;
+		//ための移動速さ
+		float chargeSpeed;
+		//攻撃降りの移動速さ
+		float swingSpeed;
+	};
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -156,4 +188,8 @@ private:
 	Quaternion moveQuaternion_{ 0.0f,0.0f,0.0f,1.0f };
 	//速度
 	Vector3 velocity_{};
+	//コンボ定数表
+	static const std::array<ConstAttack, ComboNum> kConstAttacks_;
+	//攻撃用の変数
+	WorkAttack workAttack_{};
 };
