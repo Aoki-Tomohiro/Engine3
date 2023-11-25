@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Engine/Utilities/GlobalVariables.h"
+#include "Project/GameObject/LockOn/LockOn.h"
 #include <cassert>
 #include <numbers>
 
@@ -87,8 +88,8 @@ void Player::Update() {
 	}
 
 	//ワールドトランスフォームの更新
-	worldTransform_.quaternion_ = Slerp(worldTransform_.quaternion_, moveQuaternion_, 0.4f);
-	worldTransform_.UpdateMatrix(RotationType::Quaternion);
+	worldTransform_.quaternion_ = Slerp(worldTransform_.quaternion_, destinationQuaternion_, 0.4f);
+	worldTransform_.UpdateMatrixFromQuaternion();
 
 	//武器の更新
 	weapon_->Update();
@@ -176,8 +177,8 @@ void Player::BehaviorRootUpdate() {
 			isMoving = true;
 		}
 
+		//スティックによる入力がある場合
 		if (isMoving) {
-
 			//速さ
 			const float speed = 0.3f;
 
@@ -192,10 +193,24 @@ void Player::BehaviorRootUpdate() {
 			worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
 
 			//回転
-			Vector3 nVelocity_ = Normalize(velocity_);
-			Vector3 cross = Normalize(Cross({ 0.0f,0.0f,1.0f }, nVelocity_));
-			float dot = Dot({ 0.0f,0.0f,1.0f }, nVelocity_);
-			moveQuaternion_ = MakeRotateAxisAngleQuaternion(cross, std::acos(dot));
+			Rotate(velocity_);
+		}
+		else if (lockOn_ && lockOn_->ExistTarget()) {
+			//ロックオン座標
+			Vector3 lockOnPosition = lockOn_->GetTargetPosition();
+			//追従対象からロックオン対象へのベクトル
+			Vector3 sub = Subtract(lockOnPosition, GetWorldPosition());
+
+			//距離
+			float distance = Length(sub);
+			//距離しきい値
+			const float threshold = 0.2f;
+
+			//しきい値
+			if (distance > threshold) {
+				//回転
+				Rotate(sub);
+			}
 		}
 	}
 
@@ -293,6 +308,30 @@ void Player::BehaviorAttackInitialize() {
 }
 
 void Player::BehaviorAttackUpdate() {
+	//ロックオン中
+	if (lockOn_ && lockOn_->ExistTarget()) {
+		//ロックオン座標
+		Vector3 lockOnPosition = lockOn_->GetTargetPosition();
+		//追従対象からロックオン座標へのベクトル
+		Vector3 sub = Subtract(lockOnPosition, GetWorldPosition());
+
+		//距離
+		float distance = Length(sub);
+		//距離しきい値
+		const float threshold = 0.2f;
+
+		//しきい値
+		if (distance > threshold) {
+			//回転
+			Rotate(sub);
+
+			////しきい値を超える速さなら補正する
+			//if (speed > distance - threshold) {
+			//	speed = distance - threshold;
+			//}
+		}
+	}
+
 	//コンボ上限に達していない
 	if (workAttack_.comboIndex < ComboNum - 1) {
 		if (input_->IsControllerConnected()) {
@@ -333,6 +372,7 @@ void Player::BehaviorAttackUpdate() {
 		//コンボ継続でないなら攻撃を終了してルートビヘイビアに戻る
 		else {
 			behaviorRequest_ = Behavior::kRoot;
+			weapon_->SetIsAttack(false);
 		}
 	}
 
@@ -394,6 +434,13 @@ void Player::BehaviorAttackUpdate() {
 		weapon_->SetRotation(workAttack_.rotation);
 		break;
 	}
+}
+
+void Player::Rotate(const Vector3& v) {
+	Vector3 vector = Normalize(v);
+	Vector3 cross = Normalize(Cross({ 0.0f,0.0f,1.0f }, vector));
+	float dot = Dot({ 0.0f,0.0f,1.0f }, vector);
+	destinationQuaternion_ = MakeRotateAxisAngleQuaternion(cross, std::acos(dot));
 }
 
 void Player::ApplyGlobalVariables() {

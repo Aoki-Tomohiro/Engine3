@@ -1,5 +1,6 @@
 #include "FollowCamera.h"
 #include "Engine/Utilities/GlobalVariables.h"
+#include "Project/GameObject/LockOn/LockOn.h"
 
 void FollowCamera::Initialize() {
 	//ビュープロジェクションの初期化
@@ -13,7 +14,6 @@ void FollowCamera::Initialize() {
 };
 
 void FollowCamera::Update() {
-
 	//追従対象がいれば
 	if (target_) {
 		//追従座標の補間
@@ -25,34 +25,46 @@ void FollowCamera::Update() {
 	//カメラ座標
 	camera_.translation_ = Add(interTarget_, offset);
 
-	//旋回操作
-	if (Input::GetInstance()->IsControllerConnected()) {
+	//ロックオン中
+	if (lockOn_ && lockOn_->ExistTarget()) {
+		//ロックオン座標
+		Vector3 lockOnPosition = lockOn_->GetTargetPosition();
+		//追従対象からロックオン座標へのベクトル
+		Vector3 sub = Subtract(lockOnPosition, GetTargetWorldPosition());
 
-		//しきい値
-		const float threshold = 0.7f;
+		//Y軸周り角度
+		destinationAngleY_ = std::atan2(sub.x, sub.z);
+	}
+	else {
+		//旋回操作
+		if (Input::GetInstance()->IsControllerConnected()) {
 
-		//回転フラグ
-		bool isRotation = false;
+			//しきい値
+			const float threshold = 0.7f;
 
-		//回転量
-		Vector3 rotation = {
-			Input::GetInstance()->GetRightStickY(),
-			Input::GetInstance()->GetRightStickX(),
-			0.0f
-		};
+			//回転フラグ
+			bool isRotation = false;
 
-		//スティックの押し込みが遊び範囲を超えていたら回転フラグをtureにする
-		if (Length(rotation) > threshold) {
-			isRotation = true;
-		}
+			//回転量
+			Vector3 rotation = {
+				Input::GetInstance()->GetRightStickY(),
+				Input::GetInstance()->GetRightStickX(),
+				0.0f
+			};
 
-		if (isRotation) {
-			//回転速度
-			const float kRotSpeedX = 0.02f;
-			const float kRotSpeedY = 0.04f;
+			//スティックの押し込みが遊び範囲を超えていたら回転フラグをtureにする
+			if (Length(rotation) > threshold) {
+				isRotation = true;
+			}
 
-			destinationAngleX_ -= rotation.x * kRotSpeedX;
-			destinationAngleY_ += rotation.y * kRotSpeedY;
+			if (isRotation) {
+				//回転速度
+				const float kRotSpeedX = 0.02f;
+				const float kRotSpeedY = 0.04f;
+
+				destinationAngleX_ -= rotation.x * kRotSpeedX;
+				destinationAngleY_ += rotation.y * kRotSpeedY;
+			}
 		}
 	}
 
@@ -60,7 +72,7 @@ void FollowCamera::Update() {
 	camera_.rotation_.y = LerpShortAngle(camera_.rotation_.y, destinationAngleY_, 0.1f);
 
 	//ビュー行列の更新
-	camera_.UpdateMatrix();
+	camera_.UpdateMatrixFromEuler();
 
 	//グローバル変数の適応
 	FollowCamera::ApplyGlobalVariables();

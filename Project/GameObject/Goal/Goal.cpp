@@ -16,7 +16,7 @@ void Goal::Initialize(Model* model, const Vector3& position) {
 
 void Goal::Update() {
 	//ワールドトランスフォームの更新
-	worldTransform_.UpdateMatrix(RotationType::Euler);
+	worldTransform_.UpdateMatrixFromEuler();
 }
 
 void Goal::Draw(const Camera& camera) {

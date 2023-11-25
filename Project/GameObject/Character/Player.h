@@ -6,6 +6,8 @@
 #include "Engine/Components/CollisionManager/Collider.h"
 #include <optional>
 
+class LockOn;
+
 /// <summary>
 /// プレイヤー
 /// </summary>
@@ -99,6 +101,12 @@ public:
 	Weapon* GetWeapon() { return weapon_.get(); };
 
 	/// <summary>
+	/// ロックオンを設定
+	/// </summary>
+	/// <param name="lockOn"></param>
+	void SetLockOn(const LockOn* lockOn) { lockOn_ = lockOn; };
+
+	/// <summary>
 	/// ワールド変換データを取得
 	/// </summary>
 	/// <returns></returns>
@@ -158,6 +166,11 @@ private:
 	void BehaviorJumpUpdate();
 
 	/// <summary>
+	/// プレイヤーの向きを変える
+	/// </summary>
+	void Rotate(const Vector3& vector);
+
+	/// <summary>
 	/// グローバル変数の適応
 	/// </summary>
 	void ApplyGlobalVariables();
@@ -185,11 +198,13 @@ private:
 	//ダッシュ時間
 	int behaviorDashTime_ = 10;
 	//クォータニオン
-	Quaternion moveQuaternion_{ 0.0f,0.0f,0.0f,1.0f };
+	Quaternion destinationQuaternion_{ 0.0f,0.0f,0.0f,1.0f };
 	//速度
 	Vector3 velocity_{};
 	//コンボ定数表
 	static const std::array<ConstAttack, ComboNum> kConstAttacks_;
 	//攻撃用の変数
 	WorkAttack workAttack_{};
+	//ロックオン
+	const LockOn* lockOn_ = nullptr;
 };

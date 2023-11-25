@@ -6,11 +6,6 @@ struct ConstBuffDataWorldTransform {
 	Matrix4x4 world;
 };
 
-enum class RotationType {
-	Euler,
-	Quaternion,
-};
-
 class WorldTransform {
 public:
 	/// <summary>
@@ -24,9 +19,14 @@ public:
 	void TransferMatrix();
 
 	/// <summary>
-	/// 行列の計算・転送
+	/// オイラー角で行列の計算・転送
 	/// </summary>
-	void UpdateMatrix(RotationType rotationType);
+	void UpdateMatrixFromEuler();
+
+	/// <summary>
+	/// クォータニオンで行列の計算・転送
+	/// </summary>
+	void UpdateMatrixFromQuaternion();
 
 	/// <summary>
 	/// 親を設定

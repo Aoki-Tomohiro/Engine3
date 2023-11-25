@@ -8,7 +8,7 @@ void BaseCharacter::Initialize(const std::vector<Model*>& models) {
 
 void BaseCharacter::Update() {
 	//ワールドトランスフォームの更新
-	worldTransform_.UpdateMatrix(RotationType::Euler);
+	worldTransform_.UpdateMatrixFromEuler();
 }
 
 void BaseCharacter::Draw(const Camera& camera) {

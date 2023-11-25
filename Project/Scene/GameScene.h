@@ -11,6 +11,7 @@
 #include "Project/GameObject/FollowCamera/FollowCamera.h"
 #include "Project/GameObject/Floor/Floor.h"
 #include "Project/GameObject/Goal/Goal.h"
+#include "Project/GameObject/LockOn/LockOn.h"
 
 class GameScene : public IScene {
 public:
@@ -57,8 +58,7 @@ private:
 	std::unique_ptr<Model> modelEnemyBody_ = nullptr;
 	std::unique_ptr<Model> modelEnemyL_arm_ = nullptr;
 	std::unique_ptr<Model> modelEnemyR_arm_ = nullptr;
-	//敵キャラ
-	std::unique_ptr<Enemy> enemy_ = nullptr;
+	std::list<std::unique_ptr<Enemy>> enemies_{};
 	//天球
 	std::unique_ptr<Model> skydomeModel_ = nullptr;
 	std::unique_ptr<Skydome> skydome_ = nullptr;
@@ -70,5 +70,7 @@ private:
 	//ゴール
 	std::unique_ptr<Model> goalModel_ = nullptr;
 	std::unique_ptr<Goal> goal_ = nullptr;
+	//ロックオン
+	std::unique_ptr<LockOn> lockOn_ = nullptr;
 };
 

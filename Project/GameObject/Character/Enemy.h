@@ -33,6 +33,12 @@ public:
 	void UpdateFloatingGimmick();
 
 	/// <summary>
+	/// 中心座標を取得
+	/// </summary>
+	/// <returns></returns>
+	Vector3 GetCenterPosition() const;
+
+	/// <summary>
 	/// 親を設定
 	/// </summary>
 	/// <param name="parent"></param>
@@ -76,5 +82,6 @@ private:
 	//移動速度
 	Vector3 velocity_{ 0.1f,0.0f,0.0f };
 	bool isDead_ = false;
-
+	//親のポインタ
+	const WorldTransform* parent_ = nullptr;
 };

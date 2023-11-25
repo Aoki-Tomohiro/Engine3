@@ -38,9 +38,9 @@ void Enemy::Update() {
 	UpdateFloatingGimmick();
 	//行列の更新
 	BaseCharacter::Update();
-	worldTransformBody_.UpdateMatrix(RotationType::Euler);
-	worldTransformL_arm_.UpdateMatrix(RotationType::Euler);
-	worldTransformR_arm_.UpdateMatrix(RotationType::Euler);
+	worldTransformBody_.UpdateMatrixFromEuler();
+	worldTransformL_arm_.UpdateMatrixFromEuler();
+	worldTransformR_arm_.UpdateMatrixFromEuler();
 }
 
 void Enemy::Draw(const Camera& camera) {
@@ -73,9 +73,28 @@ void Enemy::UpdateFloatingGimmick() {
 }
 
 void Enemy::OnCollision(Collider* collider) {
+	//床と当たっていた場合
+	if (collider->GetCollisionAttribute() & kCollisionAttributeFloor) {
+		//親を設定する
+		parent_ = &collider->GetWorldTransform();
+		//現在の親と別の親なら親子付けする
+		if (worldTransform_.parent_ != parent_) {
+			worldTransform_.UnsetParent();
+			worldTransform_.SetParent(parent_);
+		}
+	}
+
 	if (collider->GetCollisionAttribute() & kCollisionAttributeWeapon) {
 		isDead_ = true;
 	}
+}
+
+Vector3 Enemy::GetCenterPosition() const {
+	//見た目上の中心点オフセット(モデル座標系)
+	const Vector3 offset = { 0.0f,1.0f,0.0f };
+	//ワールド座標に変換
+	Vector3 worldPos = Transform(offset, worldTransform_.matWorld_);
+	return worldPos;
 }
 
 Vector3 Enemy::GetWorldPosition() {

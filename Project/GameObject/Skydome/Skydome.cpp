@@ -10,7 +10,7 @@ void Skydome::Initialize(Model* model) {
 
 void Skydome::Update() {
 	// 行列を定数バッファに転送
-	worldTransform_.UpdateMatrix(RotationType::Euler);
+	worldTransform_.UpdateMatrixFromEuler();
 };
 
 void Skydome::Draw(const Camera& camera) {

@@ -7,6 +7,11 @@ struct ConstBuffDataViewProjection {
 	Matrix4x4 projection;
 };
 
+enum class RotationType {
+	Euler,
+	Quaternion,
+};
+
 class Camera {
 public:
 	/// <summary>
@@ -17,7 +22,12 @@ public:
 	/// <summary>
 	/// ビュー行列の更新
 	/// </summary>
-	void UpdateViewMatrix();
+	void UpdateViewMatrixFromEuler();
+
+	/// <summary>
+	/// ビュー行列の更新
+	/// </summary>
+	void UpdateViewMatrixFromQuaternion();
 
 	/// <summary>
 	/// プロジェクション行列の更新
@@ -27,7 +37,12 @@ public:
 	/// <summary>
 	/// 行列の計算
 	/// </summary>
-	void UpdateMatrix();
+	void UpdateMatrixFromEuler();
+
+	/// <summary>
+	/// 行列の計算
+	/// </summary>
+	void UpdateMatrixFromQuaternion();
 
 	/// <summary>
 	/// CBVを転送
@@ -51,6 +66,8 @@ public:
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	//座標
 	Vector3 translation_ = { 0.0f,0.0f,-50.0f };
+	//クォータニオン
+	Quaternion quaternion_ = { 0.0f,0.0f,0.0f,1.0f };
 	//ビュー行列
 	Matrix4x4 matView_{};
 	//プロジェクション行列
