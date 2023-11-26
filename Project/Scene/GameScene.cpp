@@ -71,8 +71,18 @@ void GameScene::Update() {
 	//プレイヤーの更新
 	player_->Update();
 
+	//死亡した敵を削除
+	enemies_.remove_if([](std::unique_ptr<Enemy>& enemy) {
+		if (enemy->GetIsDead()) {
+			enemy.reset();
+			return true;
+		}
+		return false;
+	});
+
 	//敵の更新
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
+		enemy->SetIsPlayerAttack(player_->GetIsAttack());
 		enemy->Update();
 	}
 
@@ -95,9 +105,11 @@ void GameScene::Update() {
 	camera_.translation_ = followCamera_->GetCamera().translation_;
 	camera_.rotation_ = followCamera_->GetCamera().rotation_;
 	camera_.quaternion_ = followCamera_->GetCamera().quaternion_;
+	camera_.matView_ = followCamera_->GetCamera().matView_;
+	camera_.matProjection_ = followCamera_->GetCamera().matProjection_;
 
 	//カメラの更新
-	camera_.UpdateMatrixFromEuler();
+	camera_.TransferMatrix();
 
 	//衝突判定
 	collisionManager_->ClearColliderList();
@@ -106,9 +118,7 @@ void GameScene::Update() {
 		collisionManager_->SetColliderList(player_->GetWeapon());
 	}
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
-		if (enemy->GetIsDead() == false) {
-			collisionManager_->SetColliderList(enemy.get());
-		}
+		collisionManager_->SetColliderList(enemy.get());
 	}
 	for (std::unique_ptr<Floor>& floor : floors_) {
 		collisionManager_->SetColliderList(floor.get());
@@ -126,9 +136,7 @@ void GameScene::Draw() {
 
 	//敵の描画
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
-		if (enemy->GetIsDead() == false) {
-			enemy->Draw(camera_);
-		}
+		enemy->Draw(camera_);
 	}
 
 	//天球の描画
@@ -146,6 +154,8 @@ void GameScene::Draw() {
 
 	//パーティクル描画
 	renderer_->PreDrawParticles();
+
+	player_->DrawParticle(camera_);
 
 	renderer_->PostDrawParticles();
 }

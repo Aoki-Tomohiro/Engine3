@@ -2,6 +2,7 @@
 #include "Engine/3D/Model/Model.h"
 #include "Engine/3D/Matrix/WorldTransform.h"
 #include "Engine/Components/CollisionManager/Collider.h"
+#include "Engine/Components/Particle/ParticleSystem.h"
 
 /// <summary>
 /// 武器クラス
@@ -24,6 +25,12 @@ public:
 	/// </summary>
 	/// <param name="camera"></param>
 	void Draw(const Camera& camera);
+
+	/// <summary>
+	/// パーティクルの描画
+	/// </summary>
+	/// <param name="camera"></param>
+	void DrawParticle(const Camera& camera);
 
 	/// <summary>
 	/// 親を設定
@@ -80,5 +87,10 @@ private:
 	WorldTransform worldTransformCollision_{};
 	//当たり判定のフラグ
 	bool isAttack_ = false;
+	//パーティクル
+	std::unique_ptr<ParticleSystem> particleSystem_ = nullptr;
+	//当たり判定のフラグ
+	bool onCollision_ = false;
+	bool preOnCollision_ = false;
 };
 

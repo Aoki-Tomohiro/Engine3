@@ -1,6 +1,7 @@
 #include "EngineCore.h"
 #include "Engine/3D/Model/Model.h"
 #include "Engine/2D/Sprite/Sprite.h"
+#include "Engine/Components/Particle/ParticleSystem.h"
 #include "Engine/Utilities/GlobalVariables.h"
 
 EngineCore::~EngineCore() {
@@ -60,6 +61,9 @@ void EngineCore::Initialize() {
 
 	//スプライトの静的初期化
 	Sprite::StaticInitialize();
+
+	//パーティクルシステムの静的初期化
+	ParticleSystem::StaticInitialize();
 
 	//シーンマネージャーのインスタンスを取得
 	sceneManager_ = SceneManager::GetInstance();

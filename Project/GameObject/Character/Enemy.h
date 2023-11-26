@@ -48,7 +48,13 @@ public:
 	/// 死亡フラグを取得
 	/// </summary>
 	/// <returns></returns>
-	bool GetIsDead() { return isDead_; };
+	bool GetIsDead() const { return isDead_; };
+
+	/// <summary>
+	/// プレイヤーの攻撃フラグを取得
+	/// </summary>
+	/// <param name="comboIndex"></param>
+	void SetIsPlayerAttack(bool isAttack) { isPlayerAttack_ = isAttack; };
 
 	/// <summary>
 	/// ワールド変換データを取得
@@ -84,4 +90,11 @@ private:
 	bool isDead_ = false;
 	//親のポインタ
 	const WorldTransform* parent_ = nullptr;
+	//当たり判定のフラグ
+	bool onCollision_ = false;
+	bool preOnCollision_ = false;
+	//プレイヤーの攻撃フラグ
+	bool isPlayerAttack_ = false;
+	//攻撃の当たった数
+	uint32_t hitCount_ = 0;
 };

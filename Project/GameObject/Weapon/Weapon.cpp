@@ -20,9 +20,17 @@ void Weapon::Initialize(Model* model) {
 		{-worldTransformCollision_.scale_.x,-worldTransformCollision_.scale_.y,-worldTransformCollision_.scale_.z},
 		{worldTransformCollision_.scale_.x,worldTransformCollision_.scale_.y,worldTransformCollision_.scale_.z} };
 	SetAABB(aabbSize);
+
+	//パーティクル
+	particleSystem_ = std::make_unique<ParticleSystem>();
+	particleSystem_->Initialize();
 }
 
 void Weapon::Update() {
+	//前のフレームの当たり判定のフラグを取得
+	preOnCollision_ = onCollision_;
+	onCollision_ = false;
+
 	//当たり判定の位置を決める
 	Vector3 direction{ 0.0f,0.0f,4.0f };
 	//direction = TransformNormal(direction, worldTransform_.matWorld_);
@@ -33,6 +41,9 @@ void Weapon::Update() {
 	//ワールドトランスフォームの更新
 	worldTransform_.UpdateMatrixFromEuler();
 	worldTransformCollision_.UpdateMatrixFromEuler();
+
+	//パーティクルの更新
+	particleSystem_->Update();
 }
 
 void Weapon::Draw(const Camera& camera) {
@@ -40,8 +51,33 @@ void Weapon::Draw(const Camera& camera) {
 	model_->Draw(worldTransform_, camera);
 }
 
-void Weapon::OnCollision(Collider* collider) {
+void Weapon::DrawParticle(const Camera& camera) {
+	particleSystem_->Draw(camera);
+}
 
+void Weapon::OnCollision(Collider* collider) {
+	onCollision_ = true;
+	if (onCollision_ != preOnCollision_) {
+		//パーティクル
+		ParticleEmitter* newParticleEmitter = EmitterBuilder()
+			.SetArea({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+			.SetAzimuth(0.0f, 360.0f)
+			.SetColor({ 1.0f, 0.5f, 0.2f, 1.0f }, { 1.0f, 0.8f, 0.4f, 1.0f })
+			.SetCount(100)
+			.SetDeleteTime(3.0f)
+			.SetElevation(0.0f, 180.0f)
+			.SetEmitterName("Hit")
+			.SetFrequency(4.0f)
+			//.SetLifeTime(0.1f, 1.0f)
+			.SetLifeTime(0.2f, 0.4f)
+			.SetRotation({ 0.0f,0.0f,0.0f }, { 0.0f,0.0f,0.0f })
+			.SetScale({ 0.2f, 0.2f,0.2f }, { 0.25f ,0.25f ,0.25f })
+			.SetTranslation(collider->GetWorldPosition())
+			//.SetVelocity({ 0.02f ,0.02f ,0.02f }, { 0.04f ,0.04f ,0.04f })
+			.SetVelocity({ 0.2f, 0.2f, 0.2f }, { 0.4f, 0.4f, 0.4f })
+			.Build();
+		particleSystem_->AddParticleEmitter(newParticleEmitter);
+	}
 }
 
 Vector3 Weapon::GetWorldPosition() {

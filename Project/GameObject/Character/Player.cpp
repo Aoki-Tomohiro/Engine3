@@ -7,8 +7,8 @@
 //コンボ定数表
 const std::array<Player::ConstAttack, Player::ComboNum> Player::kConstAttacks_ = {
 	{
-		{ 0, 0, 20, 0, 0.0f, 0.0f, 0.14f},
-	    { 15, 10, 15, 0, -0.04f, 0.0f, 0.2f },
+		{ 0, 0, 20, 1, 0.0f, 0.0f, 0.14f},
+	    { 15, 10, 15, 1, -0.04f, 0.0f, 0.2f },
 	    { 15, 10, 15, 30, -0.04f, 0.0f, 0.2f },
 	}
 };
@@ -108,6 +108,10 @@ void Player::Draw(const Camera& camera) {
 	if (behavior_ == Behavior::kAttack) {
 		weapon_->Draw(camera);
 	}
+}
+
+void Player::DrawParticle(const Camera& camera) {
+	weapon_->DrawParticle(camera);
 }
 
 void Player::Restart() {
@@ -303,6 +307,7 @@ void Player::BehaviorAttackInitialize() {
 	workAttack_.comboIndex = 0;
 	workAttack_.inComboPhase = 0;
 	workAttack_.comboNext = false;
+	workAttack_.isAttack = true;
 	workAttack_.translation = { 0.0f,0.0f,0.0f };
 	workAttack_.rotation = { 0.0f,0.0f,0.0f };
 }
@@ -372,6 +377,7 @@ void Player::BehaviorAttackUpdate() {
 		//コンボ継続でないなら攻撃を終了してルートビヘイビアに戻る
 		else {
 			behaviorRequest_ = Behavior::kRoot;
+			workAttack_.isAttack = false;
 			weapon_->SetIsAttack(false);
 		}
 	}

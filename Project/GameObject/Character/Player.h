@@ -37,6 +37,7 @@ public:
 		int32_t comboIndex = 0;
 		int32_t inComboPhase = 0;
 		bool comboNext = false;
+		bool isAttack = false;
 	};
 
 	//コンボの数
@@ -78,6 +79,12 @@ public:
 	void Draw(const Camera& camera) override;
 
 	/// <summary>
+	/// パーティクルの描画
+	/// </summary>
+	/// <param name="camera"></param>
+	void DrawParticle(const Camera& camera);
+
+	/// <summary>
 	/// リスタート処理
 	/// </summary>
 	void Restart();
@@ -105,6 +112,12 @@ public:
 	/// </summary>
 	/// <param name="lockOn"></param>
 	void SetLockOn(const LockOn* lockOn) { lockOn_ = lockOn; };
+
+	/// <summary>
+	/// 攻撃中かどうか
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsAttack() { return workAttack_.isAttack; };
 
 	/// <summary>
 	/// ワールド変換データを取得

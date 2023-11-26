@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Engine/Base/ImGuiManager/ImGuiManager.h"
+#include "Project/GameObject/Character/Player.h"
 
 void Enemy::Initialize(const std::vector<Model*>& models) {
 	//基底クラスの初期化
@@ -26,6 +27,15 @@ void Enemy::Initialize(const std::vector<Model*>& models) {
 }
 
 void Enemy::Update() {
+	//前のフレームの当たり判定のフラグを取得
+	preOnCollision_ = onCollision_;
+	onCollision_ = false;
+
+	//プレイヤーのコンボ数が最大までいったら当たった攻撃数をリセット
+	if (isPlayerAttack_ == false) {
+		hitCount_ = 0;
+	}
+
 	//移動
 	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
 
@@ -41,6 +51,11 @@ void Enemy::Update() {
 	worldTransformBody_.UpdateMatrixFromEuler();
 	worldTransformL_arm_.UpdateMatrixFromEuler();
 	worldTransformR_arm_.UpdateMatrixFromEuler();
+
+	ImGui::Begin("Enemy");
+	ImGui::Text("IsPlayerAttack : %d", isPlayerAttack_);
+	ImGui::Text("HitCount : %d", hitCount_);
+	ImGui::End();
 }
 
 void Enemy::Draw(const Camera& camera) {
@@ -85,7 +100,14 @@ void Enemy::OnCollision(Collider* collider) {
 	}
 
 	if (collider->GetCollisionAttribute() & kCollisionAttributeWeapon) {
-		isDead_ = true;
+		onCollision_ = true;
+		if (onCollision_ != preOnCollision_) {
+			hitCount_++;
+		}
+
+		if (hitCount_ >= Player::ComboNum) {
+			isDead_ = true;
+		}
 	}
 }
 

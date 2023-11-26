@@ -19,6 +19,8 @@ public:
 		std::unique_ptr<UploadBuffer> intermediateResource = nullptr;
 		//テクスチャの名前
 		std::string name{};
+		//テクスチャハンドル
+		uint32_t textureHandle = 0;
 	};
 
 	/// <summary>
@@ -63,7 +65,7 @@ public:
 	/// <param name="kNumInstance"></param>
 	/// <param name="size"></param>
 	/// <returns></returns>
-	uint32_t CreateInstancingShaderResourceView(UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size);
+	D3D12_GPU_DESCRIPTOR_HANDLE CreateInstancingShaderResourceView(UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size);
 
 	/// <summary>
 	/// テクスチャの情報を取得

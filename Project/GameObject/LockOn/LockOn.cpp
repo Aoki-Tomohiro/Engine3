@@ -22,6 +22,9 @@ void LockOn::Update(const std::list<std::unique_ptr<Enemy>>& enemies,const Camer
 			//ロックオンを外す
 			target_ = nullptr;
 		}
+		else if (target_->GetIsDead()) {
+			target_ = nullptr;
+		}
 	}
 	else {
 		//ロックオン対象の検索
@@ -48,15 +51,15 @@ void LockOn::Update(const std::list<std::unique_ptr<Enemy>>& enemies,const Camer
 						targets.emplace_back(std::make_pair(positionView.z, enemy.get()));
 					}
 				}
+			}
 
-				//ターゲット対象をリセット
-				target_ = nullptr;
-				if (targets.size() != 0) {
-					//距離で昇順にソート
-					targets.sort([](auto& pair1, auto& pair2) {return pair1.first < pair2.first; });
-					//ソートの結果一番近い敵をロックオン対象とする
-					target_ = targets.front().second;
-				}
+			//ターゲット対象をリセット
+			target_ = nullptr;
+			if (targets.size() != 0) {
+				//距離で昇順にソート
+				targets.sort([](auto& pair1, auto& pair2) {return pair1.first < pair2.first; });
+				//ソートの結果一番近い敵をロックオン対象とする
+				target_ = targets.front().second;
 			}
 		}
 	}
