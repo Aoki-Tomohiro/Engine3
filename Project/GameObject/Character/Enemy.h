@@ -51,6 +51,12 @@ public:
 	bool GetIsDead() const { return isDead_; };
 
 	/// <summary>
+	/// 死亡アニメーションの終了フラグを取得
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsDeathAnimationEnd() const { return isDeathAnimationEnd_; };
+
+	/// <summary>
 	/// プレイヤーの攻撃フラグを取得
 	/// </summary>
 	/// <param name="comboIndex"></param>
@@ -88,6 +94,7 @@ private:
 	//移動速度
 	Vector3 velocity_{ 0.1f,0.0f,0.0f };
 	bool isDead_ = false;
+	bool isDeathAnimationEnd_ = false;
 	//親のポインタ
 	const WorldTransform* parent_ = nullptr;
 	//当たり判定のフラグ
@@ -97,4 +104,6 @@ private:
 	bool isPlayerAttack_ = false;
 	//攻撃の当たった数
 	uint32_t hitCount_ = 0;
+	//死亡アニメーションの速度
+	Vector3 deathAnimationVelocity{ 0.0f,0.0f,0.0f };
 };

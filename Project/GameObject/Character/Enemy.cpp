@@ -44,6 +44,19 @@ void Enemy::Update() {
 		velocity_.x *= -1;
 	}
 
+	if (isDead_) {
+		const float kRotSpeed = 0.2f;
+		const float kDisappearanceTime = 60.0f;
+		worldTransform_.translation_ = Add(worldTransform_.translation_, deathAnimationVelocity);
+		worldTransform_.rotation_.x += kRotSpeed;
+		worldTransform_.scale_.x -= 1.0f / kDisappearanceTime;
+		worldTransform_.scale_.y -= 1.0f / kDisappearanceTime;
+		worldTransform_.scale_.z -= 1.0f / kDisappearanceTime;
+		if (worldTransform_.scale_.x <= 0.0f || worldTransform_.scale_.y <= 0.0f || worldTransform_.scale_.z <= 0.0f) {
+			isDeathAnimationEnd_ = true;
+		}
+	}
+
 	// 浮遊ギミックの更新
 	UpdateFloatingGimmick();
 	//行列の更新
@@ -51,11 +64,6 @@ void Enemy::Update() {
 	worldTransformBody_.UpdateMatrixFromEuler();
 	worldTransformL_arm_.UpdateMatrixFromEuler();
 	worldTransformR_arm_.UpdateMatrixFromEuler();
-
-	ImGui::Begin("Enemy");
-	ImGui::Text("IsPlayerAttack : %d", isPlayerAttack_);
-	ImGui::Text("HitCount : %d", hitCount_);
-	ImGui::End();
 }
 
 void Enemy::Draw(const Camera& camera) {
@@ -75,16 +83,18 @@ void Enemy::InitializeFloatingGimmick() {
 }
 
 void Enemy::UpdateFloatingGimmick() {
-	//1フレームでのパラメータ加算値
-	const float step = 2.0f * 3.14f / cycle_;
-	//パラメータを１ステップ分加算
-	floatingParameter_ += step;
-	//2πを超えたら０に戻す
-	floatingParameter_ = std::fmod(floatingParameter_, 2.0f * 3.14f);
-	//浮遊を座標に反映
-	worldTransformBody_.translation_.y = std::sin(floatingParameter_) * amplitude_;
-	worldTransformL_arm_.rotation_.y = std::sin(floatingParameter_) * amplitude_;
-	worldTransformR_arm_.rotation_.y = -std::sin(floatingParameter_) * amplitude_;
+	if (isDead_ == false) {
+		//1フレームでのパラメータ加算値
+		const float step = 2.0f * 3.14f / cycle_;
+		//パラメータを１ステップ分加算
+		floatingParameter_ += step;
+		//2πを超えたら０に戻す
+		floatingParameter_ = std::fmod(floatingParameter_, 2.0f * 3.14f);
+		//浮遊を座標に反映
+		worldTransformBody_.translation_.y = std::sin(floatingParameter_) * amplitude_;
+		worldTransformL_arm_.rotation_.y = std::sin(floatingParameter_) * amplitude_;
+		worldTransformR_arm_.rotation_.y = -std::sin(floatingParameter_) * amplitude_;
+	}
 }
 
 void Enemy::OnCollision(Collider* collider) {
@@ -107,6 +117,9 @@ void Enemy::OnCollision(Collider* collider) {
 
 		if (hitCount_ >= Player::ComboNum) {
 			isDead_ = true;
+			const float kSpeed = 1.0f;
+			deathAnimationVelocity = { 0.0f,0.0f,kSpeed };
+			deathAnimationVelocity = TransformNormal(deathAnimationVelocity, collider->GetWorldTransform().matWorld_);
 		}
 	}
 }

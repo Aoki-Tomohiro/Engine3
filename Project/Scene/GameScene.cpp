@@ -73,7 +73,7 @@ void GameScene::Update() {
 
 	//死亡した敵を削除
 	enemies_.remove_if([](std::unique_ptr<Enemy>& enemy) {
-		if (enemy->GetIsDead()) {
+		if (enemy->GetIsDeathAnimationEnd()) {
 			enemy.reset();
 			return true;
 		}
@@ -134,11 +134,6 @@ void GameScene::Draw() {
 	//プレイヤーの描画
 	player_->Draw(camera_);
 
-	//敵の描画
-	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
-		enemy->Draw(camera_);
-	}
-
 	//天球の描画
 	skydome_->Draw(camera_);
 
@@ -149,6 +144,16 @@ void GameScene::Draw() {
 
 	//ゴールの描画
 	goal_->Draw(camera_);
+
+	renderer_->PostDrawModels();
+
+	//透明モデル描画
+	renderer_->PreDrawModels(Renderer::Opaque);
+
+	//敵の描画
+	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
+		enemy->Draw(camera_);
+	}
 
 	renderer_->PostDrawModels();
 
