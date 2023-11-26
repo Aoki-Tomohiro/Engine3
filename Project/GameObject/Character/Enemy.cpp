@@ -118,7 +118,7 @@ void Enemy::OnCollision(Collider* collider) {
 		if (hitCount_ >= Player::ComboNum) {
 			isDead_ = true;
 			const float kSpeed = 1.0f;
-			deathAnimationVelocity = { 0.0f,0.0f,kSpeed };
+			deathAnimationVelocity = { 0.0f,0.4f,kSpeed };
 			deathAnimationVelocity = TransformNormal(deathAnimationVelocity, collider->GetWorldTransform().matWorld_);
 		}
 	}

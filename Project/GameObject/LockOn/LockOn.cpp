@@ -1,4 +1,5 @@
 #include "LockOn.h"
+#include <algorithm>
 
 void LockOn::Initialize() {
 	//インスタンスを取得
@@ -11,57 +12,11 @@ void LockOn::Initialize() {
 }
 
 void LockOn::Update(const std::list<std::unique_ptr<Enemy>>& enemies,const Camera& camera) {
-	//ロックオン状態なら
-	if (target_) {
-		//ロックオン解除処理
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_THUMB)) {
-			//ロックオンを外す
-			target_ = nullptr;
-		}
-		else if (InRange(camera)) {
-			//ロックオンを外す
-			target_ = nullptr;
-		}
-		else if (target_->GetIsDead()) {
-			target_ = nullptr;
-		}
+	if (isManualLockOn_) {
+		ManualLockOn(enemies, camera);
 	}
 	else {
-		//ロックオン対象の検索
-		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_THUMB)) {
-			//目標
-			std::list<std::pair<float, const Enemy*>> targets;
-
-			//すべての敵に対して順にロックオン判定
-			for (const std::unique_ptr<Enemy>& enemy : enemies) {
-				//敵のロックオン座標取得
-				Vector3 positionWorld = enemy->GetCenterPosition();
-				//ワールド→ビュー座標変換
-				Vector3 positionView = Transform(positionWorld, camera.matView_);
-
-				//距離条件チェック
-				if (minDistance_ <= positionView.z && positionView.z <= maxDistance_) {
-					//カメラ前方との角度を計算
-					//float arcTangent = std::atan2(std::sqrt(positionView.x * positionView.x + positionView.y * positionView.y), positionView.z);
-					float norm = Length(positionView);
-					float arcTangent = std::acos(positionView.z / norm);
-
-					//角度条件チェック(コーンに収まっているか)
-					if (std::abs(arcTangent) <= angleRange_) {
-						targets.emplace_back(std::make_pair(positionView.z, enemy.get()));
-					}
-				}
-			}
-
-			//ターゲット対象をリセット
-			target_ = nullptr;
-			if (targets.size() != 0) {
-				//距離で昇順にソート
-				targets.sort([](auto& pair1, auto& pair2) {return pair1.first < pair2.first; });
-				//ソートの結果一番近い敵をロックオン対象とする
-				target_ = targets.front().second;
-			}
-		}
+		AutoLockOn(enemies, camera);
 	}
 
 	//ロックオン状態なら
@@ -79,6 +34,10 @@ void LockOn::Update(const std::list<std::unique_ptr<Enemy>>& enemies,const Camer
 		//スプライトの座標を設定
 		lockOnMark_->SetPosition(positionScreenV2);
 	}
+
+	ImGui::Begin("LockOn");
+	ImGui::Checkbox("IsManualLockOn", &isManualLockOn_);
+	ImGui::End();
 }
 
 void LockOn::Draw() {
@@ -112,4 +71,107 @@ Vector3 LockOn::GetTargetPosition() const {
 		return target_->GetCenterPosition();
 	}
 	return Vector3();
+}
+
+void LockOn::ManualLockOn(const std::list<std::unique_ptr<Enemy>>& enemies, const Camera& camera) {
+	//ロックオン状態なら
+	if (target_) {
+		//ロックオン解除処理
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_THUMB)) {
+			//ロックオンを外す
+			target_ = nullptr;
+		}
+		else if (InRange(camera)) {
+			//ロックオンを外す
+			target_ = nullptr;
+		}
+		else if (target_->GetIsDead()) {
+			target_ = nullptr;
+		}
+
+		//ターゲットを変える
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_B)) {
+			SearchLockOnTarget(enemies, camera);
+			targetIndex_++;
+			if (targetIndex_ >= targets_.size()) {
+				targetIndex_ = 0;
+				target_ = nullptr;
+				target_ = targets_[targetIndex_].second;
+			}
+			else {
+				target_ = nullptr;
+				target_ = targets_[targetIndex_].second;
+			}
+		}
+	}
+	else {
+		//ロックオン対象の検索
+		if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_THUMB)) {
+			SearchLockOnTarget(enemies, camera);
+		}
+	}
+}
+
+void LockOn::AutoLockOn(const std::list<std::unique_ptr<Enemy>>& enemies, const Camera& camera) {
+	//ロックオン切り替え処理
+	if (input_->IsPressButtonEnter(XINPUT_GAMEPAD_RIGHT_THUMB)) {
+		if (isLockOn_) {
+			//ロックオンを外す
+			isLockOn_ = false;
+			target_ = nullptr;
+		}
+		else {
+			isLockOn_ = true;
+		}
+	}
+
+	if (target_ && InRange(camera)) {
+		//ロックオンを外す
+		target_ = nullptr;
+	}
+	else if (target_ && target_->GetIsDead()) {
+		//ロックオンを外す
+		target_ = nullptr;
+	}
+
+	if (isLockOn_) {
+		//ロックオン対象の検索
+		SearchLockOnTarget(enemies, camera);
+	}
+}
+
+void LockOn::SearchLockOnTarget(const std::list<std::unique_ptr<Enemy>>& enemies, const Camera& camera) {
+	//リストのリセット
+	targets_.clear();
+
+	//すべての敵に対して順にロックオン判定
+	for (const std::unique_ptr<Enemy>& enemy : enemies) {
+		//敵のロックオン座標取得
+		Vector3 positionWorld = enemy->GetCenterPosition();
+		//ワールド→ビュー座標変換
+		Vector3 positionView = Transform(positionWorld, camera.matView_);
+
+		//距離条件チェック
+		if (minDistance_ <= positionView.z && positionView.z <= maxDistance_) {
+			//カメラ前方との角度を計算
+			//float arcTangent = std::atan2(std::sqrt(positionView.x * positionView.x + positionView.y * positionView.y), positionView.z);
+			float norm = Length(positionView);
+			float arcTangent = std::acos(positionView.z / norm);
+
+			//角度条件チェック(コーンに収まっているか)
+			if (std::abs(arcTangent) <= angleRange_ && enemy->GetIsDead() == false) {
+				targets_.emplace_back(std::make_pair(positionView.z, enemy.get()));
+			}
+		}
+	}
+
+	//ターゲット対象をリセット
+	target_ = nullptr;
+	if (targets_.size() != 0) {
+		//距離で昇順にソート
+		//targets.sort([](auto& pair1, auto& pair2) {return pair1.first < pair2.first; });
+		std::sort(targets_.begin(), targets_.end(), [](auto& pair1, auto& pair2) {return pair1.first < pair2.first; });
+		//ソートの結果一番近い敵をロックオン対象とする
+		target_ = targets_.front().second;
+	}
 }
