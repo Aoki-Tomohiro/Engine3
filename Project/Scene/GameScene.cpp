@@ -31,10 +31,11 @@ void GameScene::Initialize() {
 	modelEnemyBody_.reset(Model::CreateFromOBJ("Resources/Models/Enemy_Body", "Enemy_Body.obj"));
 	modelEnemyL_arm_.reset(Model::CreateFromOBJ("Resources/Models/Enemy_L_arm", "Enemy_L_arm.obj"));
 	modelEnemyR_arm_.reset(Model::CreateFromOBJ("Resources/Models/Enemy_R_arm", "Enemy_R_arm.obj"));
-	std::vector<Model*> enemyModels = { modelEnemyBody_.get(),modelEnemyL_arm_.get(),modelEnemyR_arm_.get() };
-	Enemy* enemy = new Enemy();
-	enemy->Initialize(enemyModels);
-	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
+	AddEnemy({ 0.0f,0.0f,15.0f }, { 0.0f,0.0f,0.0f });
+	AddEnemy({ -5.0f,0.0f,35.0f }, { 0.06f,0.0f,0.0f });
+	AddEnemy({ 5.0f,0.0f,45.0f }, { 0.06f,0.0f,0.0f });
+	AddEnemy({ 5.0f,0.0f,55.0f }, { 0.04f,0.0f,0.0f });
+	AddEnemy({ -5.0f,0.0f,65.0f }, { 0.04f,0.0f,0.0f });
 
 	//天球の作成
 	skydomeModel_.reset(Model::CreateFromOBJ("Resources/Models/Skydome", "Skydome.obj"));
@@ -134,6 +135,11 @@ void GameScene::Draw() {
 	//プレイヤーの描画
 	player_->Draw(camera_);
 
+	//敵の描画
+	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
+		enemy->Draw(camera_);
+	}
+
 	//天球の描画
 	skydome_->Draw(camera_);
 
@@ -144,16 +150,6 @@ void GameScene::Draw() {
 
 	//ゴールの描画
 	goal_->Draw(camera_);
-
-	renderer_->PostDrawModels();
-
-	//透明モデル描画
-	renderer_->PreDrawModels(Renderer::Opaque);
-
-	//敵の描画
-	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
-		enemy->Draw(camera_);
-	}
 
 	renderer_->PostDrawModels();
 
@@ -172,4 +168,12 @@ void GameScene::DrawUI() {
 	lockOn_->Draw();
 
 	renderer_->PostDrawSprites();
+}
+void GameScene::AddEnemy(const Vector3& position,const Vector3& velocity) {
+	std::vector<Model*> enemyModels = { modelEnemyBody_.get(),modelEnemyL_arm_.get(),modelEnemyR_arm_.get() };
+	Enemy* enemy = new Enemy();
+	enemy->Initialize(enemyModels);
+	enemy->SetPosition(position);
+	enemy->SetVelocity(velocity);
+	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
 }

@@ -43,6 +43,13 @@ public:
 	/// </summary>
 	void DrawUI() override;
 
+	/// <summary>
+	/// 敵を追加
+	/// </summary>
+	/// <param name="position"></param>
+	/// <param name="velocity"></param>
+	void AddEnemy(const Vector3& position, const Vector3& velocity);
+
 private:
 	//Renderer
 	Renderer* renderer_ = nullptr;

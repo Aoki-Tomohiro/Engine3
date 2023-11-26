@@ -63,6 +63,18 @@ public:
 	void SetIsPlayerAttack(bool isAttack) { isPlayerAttack_ = isAttack; };
 
 	/// <summary>
+	/// 座標を設定
+	/// </summary>
+	/// <param name="position"></param>
+	void SetPosition(const Vector3& position) { worldTransform_.translation_ = position; };
+
+	/// <summary>
+	/// 速度を設定
+	/// </summary>
+	/// <param name="velocity"></param>
+	void SetVelocity(const Vector3& velocity) { velocity_ = velocity; };
+
+	/// <summary>
 	/// ワールド変換データを取得
 	/// </summary>
 	/// <returns></returns>
