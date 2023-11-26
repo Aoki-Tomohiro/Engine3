@@ -64,12 +64,6 @@ void Enemy::Update() {
 	worldTransformBody_.UpdateMatrixFromEuler();
 	worldTransformL_arm_.UpdateMatrixFromEuler();
 	worldTransformR_arm_.UpdateMatrixFromEuler();
-
-	ImGui::Begin("Enemy");
-	ImGui::DragFloat3("Translation", &worldTransform_.translation_.x);
-	ImGui::DragFloat3("Rotation", &worldTransform_.rotation_.x);
-	ImGui::DragFloat3("Scale", &worldTransform_.scale_.x);
-	ImGui::End();
 }
 
 void Enemy::Draw(const Camera& camera) {

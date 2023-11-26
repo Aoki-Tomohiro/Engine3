@@ -234,4 +234,6 @@ private:
 	const LockOn* lockOn_ = nullptr;
 	//死亡フラグ
 	bool isDead_ = false;
+	//落下スピード
+	float fallingSpeed_ = 0.0f;
 };

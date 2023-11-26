@@ -78,8 +78,13 @@ void Player::Update() {
 	}
 
 	//当たっていないときは落ちる
-	if (onCollision_ == false) {
-		worldTransform_.translation_.y -= 0.1f;
+	if (onCollision_ == false && behavior_ != Behavior::kJump) {
+		const float kGravityAcceleration = 0.05f;
+		fallingSpeed_ -= kGravityAcceleration;
+		worldTransform_.translation_.y += fallingSpeed_;
+	}
+	else {
+		fallingSpeed_ = 0.0f;
 	}
 
 	//落ちたらリスタート
