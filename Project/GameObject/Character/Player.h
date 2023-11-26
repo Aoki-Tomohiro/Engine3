@@ -120,6 +120,18 @@ public:
 	bool GetIsAttack() { return workAttack_.isAttack; };
 
 	/// <summary>
+	/// 死亡フラグを取得
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsDead() { return isDead_; };
+
+	/// <summary>
+	/// 死亡フラグを設定
+	/// </summary>
+	/// <param name="isDead"></param>
+	void SetIsDead(bool isDead) { isDead_ = isDead; };
+
+	/// <summary>
 	/// ワールド変換データを取得
 	/// </summary>
 	/// <returns></returns>
@@ -220,4 +232,6 @@ private:
 	WorkAttack workAttack_{};
 	//ロックオン
 	const LockOn* lockOn_ = nullptr;
+	//死亡フラグ
+	bool isDead_ = false;
 };

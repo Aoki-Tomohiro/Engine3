@@ -5,7 +5,7 @@
 void Enemy::Initialize(const std::vector<Model*>& models) {
 	//基底クラスの初期化
 	BaseCharacter::Initialize(models);
-	worldTransform_.translation_.z = 0.0f;
+	startPosition = worldTransform_.translation_;
 	//ワールドトランスフォームの初期化
 	worldTransformBody_.Initialize();
 	worldTransformL_arm_.Initialize();
@@ -64,6 +64,12 @@ void Enemy::Update() {
 	worldTransformBody_.UpdateMatrixFromEuler();
 	worldTransformL_arm_.UpdateMatrixFromEuler();
 	worldTransformR_arm_.UpdateMatrixFromEuler();
+
+	ImGui::Begin("Enemy");
+	ImGui::DragFloat3("Translation", &worldTransform_.translation_.x);
+	ImGui::DragFloat3("Rotation", &worldTransform_.rotation_.x);
+	ImGui::DragFloat3("Scale", &worldTransform_.scale_.x);
+	ImGui::End();
 }
 
 void Enemy::Draw(const Camera& camera) {
@@ -138,4 +144,13 @@ Vector3 Enemy::GetWorldPosition() {
 	pos.y = worldTransform_.matWorld_.m[3][1];
 	pos.z = worldTransform_.matWorld_.m[3][2];
 	return pos;
+}
+
+void Enemy::Reset() {
+	worldTransform_.UnsetParent();
+	worldTransform_.translation_ = startPosition;
+	worldTransform_.rotation_ = { 0.0f,0.0f,0.0f };
+	worldTransform_.scale_ = { 1.0f,1.0f,1.0f };
+	isDead_ = false;
+	isDeathAnimationEnd_ = false;
 }

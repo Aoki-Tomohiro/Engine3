@@ -31,11 +31,9 @@ void GameScene::Initialize() {
 	modelEnemyBody_.reset(Model::CreateFromOBJ("Resources/Models/Enemy_Body", "Enemy_Body.obj"));
 	modelEnemyL_arm_.reset(Model::CreateFromOBJ("Resources/Models/Enemy_L_arm", "Enemy_L_arm.obj"));
 	modelEnemyR_arm_.reset(Model::CreateFromOBJ("Resources/Models/Enemy_R_arm", "Enemy_R_arm.obj"));
-	AddEnemy({ 0.0f,0.0f,15.0f }, { 0.0f,0.0f,0.0f });
-	AddEnemy({ -5.0f,0.0f,35.0f }, { 0.06f,0.0f,0.0f });
-	AddEnemy({ 5.0f,0.0f,45.0f }, { 0.06f,0.0f,0.0f });
-	AddEnemy({ 5.0f,0.0f,55.0f }, { 0.04f,0.0f,0.0f });
-	AddEnemy({ -5.0f,0.0f,65.0f }, { 0.04f,0.0f,0.0f });
+	for (int i = 0; i < kEnemyMax; i++) {
+		AddEnemy(enemyPositions_[i], enemyVelocities_[i]);
+	}
 
 	//天球の作成
 	skydomeModel_.reset(Model::CreateFromOBJ("Resources/Models/Skydome", "Skydome.obj"));
@@ -54,7 +52,7 @@ void GameScene::Initialize() {
 	for (uint32_t i = 0; i < kFloorMax; ++i) {
 		Floor* floor = new Floor();
 		if (i % 2 == 1) {
-			floor->Initialize(floorModel_.get(), { 0.0f,0.0f,i * 20.0f }, { i * 0.1f,0.0f,0.0f });
+			floor->Initialize(floorModel_.get(), { 0.0f,0.0f,i * 20.0f }, { i * 0.06f,0.0f,0.0f });
 		}
 		else {
 			floor->Initialize(floorModel_.get(), { 0.0f,0.0f,i * 20.0f }, { 0.0f,0.0f,0.0f });
@@ -65,21 +63,12 @@ void GameScene::Initialize() {
 	//ゴールの作成
 	goalModel_.reset(Model::CreateFromOBJ("Resources/Models/Goal", "Goal.obj"));
 	goal_ = std::make_unique<Goal>();
-	goal_->Initialize(goalModel_.get(), { 0.0f,0.0f,4 * 20.0f });
+	goal_->Initialize(goalModel_.get(), { 0.0f,0.0f,6 * 20.0f + 5.0f });
 }
 
 void GameScene::Update() {
 	//プレイヤーの更新
 	player_->Update();
-
-	//死亡した敵を削除
-	enemies_.remove_if([](std::unique_ptr<Enemy>& enemy) {
-		if (enemy->GetIsDeathAnimationEnd()) {
-			enemy.reset();
-			return true;
-		}
-		return false;
-	});
 
 	//敵の更新
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
@@ -119,13 +108,20 @@ void GameScene::Update() {
 		collisionManager_->SetColliderList(player_->GetWeapon());
 	}
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
-		collisionManager_->SetColliderList(enemy.get());
+		if (enemy->GetIsDead() == false) {
+			collisionManager_->SetColliderList(enemy.get());
+		}
 	}
 	for (std::unique_ptr<Floor>& floor : floors_) {
 		collisionManager_->SetColliderList(floor.get());
 	}
 	collisionManager_->SetColliderList(goal_.get());
 	collisionManager_->CheckAllCollisions();
+
+	//リスタート処理
+	if (player_->GetIsDead()) {
+		Reset();
+	}
 }
 
 void GameScene::Draw() {
@@ -137,7 +133,9 @@ void GameScene::Draw() {
 
 	//敵の描画
 	for (const std::unique_ptr<Enemy>& enemy : enemies_) {
-		enemy->Draw(camera_);
+		if (enemy->GetIsDeathAnimationEnd() == false) {
+			enemy->Draw(camera_);
+		}
 	}
 
 	//天球の描画
@@ -169,11 +167,19 @@ void GameScene::DrawUI() {
 
 	renderer_->PostDrawSprites();
 }
+
 void GameScene::AddEnemy(const Vector3& position,const Vector3& velocity) {
 	std::vector<Model*> enemyModels = { modelEnemyBody_.get(),modelEnemyL_arm_.get(),modelEnemyR_arm_.get() };
 	Enemy* enemy = new Enemy();
-	enemy->Initialize(enemyModels);
-	enemy->SetPosition(position);
+	enemy->SetStartPosition(position);
 	enemy->SetVelocity(velocity);
+	enemy->Initialize(enemyModels);
 	enemies_.push_back(std::unique_ptr<Enemy>(enemy));
+}
+
+void GameScene::Reset() {
+	player_->SetIsDead(false);
+	for (std::unique_ptr<Enemy>& enemy : enemies_) {
+		enemy->Reset();
+	}
 }

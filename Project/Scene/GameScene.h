@@ -16,7 +16,9 @@
 class GameScene : public IScene {
 public:
 	//床の数
-	static const int kFloorMax = 5;
+	static const int kFloorMax = 7;
+	//敵の数
+	static const int kEnemyMax = 5;
 
 	/// <summary>
 	/// デストラクタ
@@ -43,12 +45,18 @@ public:
 	/// </summary>
 	void DrawUI() override;
 
+private:
 	/// <summary>
 	/// 敵を追加
 	/// </summary>
 	/// <param name="position"></param>
 	/// <param name="velocity"></param>
 	void AddEnemy(const Vector3& position, const Vector3& velocity);
+
+	/// <summary>
+	/// リセット
+	/// </summary>
+	void Reset();
 
 private:
 	//Renderer
@@ -79,5 +87,21 @@ private:
 	std::unique_ptr<Goal> goal_ = nullptr;
 	//ロックオン
 	std::unique_ptr<LockOn> lockOn_ = nullptr;
+	//敵の座標
+	Vector3 enemyPositions_[kEnemyMax] = {
+		{ 0.0f,0.0f,35.0f },
+		{ -5.0f,0.0f,45.0f },
+		{ 5.0f,0.0f,75.0f },
+		{ 5.0f,0.0f,85.0f },
+		{ -5.0f,0.0f,115.0f },
+	};
+	//敵の速度
+	Vector3 enemyVelocities_[kEnemyMax] = {
+		{ 0.0f,0.0f,0.0f },
+		{ 0.06f,0.0f,0.0f },
+		{ 0.06f,0.0f,0.0f },
+		{ 0.04f,0.0f,0.0f },
+		{ 0.04f,0.0f,0.0f },
+	};
 };
 

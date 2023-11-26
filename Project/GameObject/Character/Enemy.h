@@ -23,16 +23,6 @@ public:
 	void Draw(const Camera& camera) override;
 
 	/// <summary>
-	/// 浮遊ギミックの初期化
-	/// </summary>
-	void InitializeFloatingGimmick();
-
-	/// <summary>
-	/// 浮遊ギミック更新
-	/// </summary>
-	void UpdateFloatingGimmick();
-
-	/// <summary>
 	/// 中心座標を取得
 	/// </summary>
 	/// <returns></returns>
@@ -66,13 +56,18 @@ public:
 	/// 座標を設定
 	/// </summary>
 	/// <param name="position"></param>
-	void SetPosition(const Vector3& position) { worldTransform_.translation_ = position; };
+	void SetStartPosition(const Vector3& position) { worldTransform_.translation_ = position; };
 
 	/// <summary>
 	/// 速度を設定
 	/// </summary>
 	/// <param name="velocity"></param>
 	void SetVelocity(const Vector3& velocity) { velocity_ = velocity; };
+
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	void Reset();
 
 	/// <summary>
 	/// ワールド変換データを取得
@@ -91,6 +86,17 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	Vector3 GetWorldPosition() override;
+
+private:
+	/// <summary>
+	/// 浮遊ギミックの初期化
+	/// </summary>
+	void InitializeFloatingGimmick();
+
+	/// <summary>
+	/// 浮遊ギミック更新
+	/// </summary>
+	void UpdateFloatingGimmick();
 
 private:
 	//ワールドトランスフォーム
@@ -118,4 +124,6 @@ private:
 	uint32_t hitCount_ = 0;
 	//死亡アニメーションの速度
 	Vector3 deathAnimationVelocity{ 0.0f,0.0f,0.0f };
+	//初期座標
+	Vector3 startPosition{};
 };

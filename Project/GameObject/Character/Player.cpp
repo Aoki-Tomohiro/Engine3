@@ -118,6 +118,7 @@ void Player::Restart() {
 	//初期座標に戻す
 	worldTransform_.translation_ = { 0.0f,0.0f,0.0f };
 	worldTransform_.parent_ = nullptr;
+	isDead_ = true;
 }
 
 void Player::OnCollision(Collider* collider) {
