@@ -402,6 +402,10 @@ void Player::BehaviorAttackUpdate() {
 			weapon_->SetIsAttack(true);
 		}
 
+		if (workAttack_.attackParameter >= swingTime && workAttack_.attackParameter < totalTime) {
+			weapon_->SetIsAttack(false);
+		}
+
 		weapon_->SetTranslation(workAttack_.translation);
 		weapon_->SetRotation(workAttack_.rotation);
 		break;
@@ -419,6 +423,10 @@ void Player::BehaviorAttackUpdate() {
 			weapon_->SetIsAttack(true);
 		}
 
+		if (workAttack_.attackParameter >= swingTime && workAttack_.attackParameter < totalTime) {
+			weapon_->SetIsAttack(false);
+		}
+
 		weapon_->SetTranslation(workAttack_.translation);
 		weapon_->SetRotation(workAttack_.rotation);
 		break;
@@ -434,6 +442,10 @@ void Player::BehaviorAttackUpdate() {
 		if (workAttack_.attackParameter >= chargeTime && workAttack_.attackParameter < swingTime) {
 			workAttack_.rotation.x += kConstAttacks_[workAttack_.comboIndex].swingSpeed;
 			weapon_->SetIsAttack(true);
+		}
+
+		if (workAttack_.attackParameter >= swingTime && workAttack_.attackParameter < totalTime) {
+			weapon_->SetIsAttack(false);
 		}
 
 		weapon_->SetTranslation(workAttack_.translation);
