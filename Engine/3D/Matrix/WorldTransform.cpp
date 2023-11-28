@@ -13,16 +13,22 @@ void WorldTransform::TransferMatrix() {
 	constBuff_->Unmap();
 }
 
-void WorldTransform::UpdateMatrix(RotationType rotationType) {
+void WorldTransform::UpdateMatrixFromEuler() {
 	//ワールド行列を計算
-	switch (rotationType) {
-	case RotationType::Euler:
-		matWorld_ = MakeAffineMatrix(scale_, rotation_, translation_);
-		break;
-	case RotationType::Quaternion:
-		matWorld_ = MakeAffineMatrix(scale_, quaternion_, translation_);
-		break;
+	matWorld_ = MakeAffineMatrix(scale_, rotation_, translation_);
+
+	//親がいれば行列を掛ける
+	if (parent_) {
+		matWorld_ = Multiply(matWorld_, parent_->matWorld_);
 	}
+
+	//ワールド行列を転送する
+	WorldTransform::TransferMatrix();
+}
+
+void WorldTransform::UpdateMatrixFromQuaternion() {
+	//ワールド行列を計算
+	matWorld_ = MakeAffineMatrix(scale_, quaternion_, translation_);
 
 	//親がいれば行列を掛ける
 	if (parent_) {

@@ -14,7 +14,7 @@ void Camera::TransferMatrix() {
 	constBuff_->Unmap();
 }
 
-void Camera::UpdateViewMatrix() {
+void Camera::UpdateViewMatrixFromEuler() {
 	//平行移動行列の計算
 	Matrix4x4 translateMatrix = MakeTranslateMatrix(translation_);
 	//回転行列の計算
@@ -26,14 +26,32 @@ void Camera::UpdateViewMatrix() {
 	matView_ = Multiply(Inverse(translateMatrix), Inverse(rotateMatrix));
 }
 
+void Camera::UpdateViewMatrixFromQuaternion() {
+	//平行移動行列の計算
+	Matrix4x4 translateMatrix = MakeTranslateMatrix(translation_);
+	//回転行列の計算
+	Matrix4x4 rotateMatrix = MakeRotateMatrix(quaternion_);
+	//ビュー行列の計算
+	matView_ = Multiply(Inverse(translateMatrix), Inverse(rotateMatrix));
+}
+
 void Camera::UpdateProjectionMatrix() {
 	//プロジェクション行列の計算
 	matProjection_ = MakePerspectiveFovMatrix(fov_, aspectRatio_, nearClip_, farClip_);
 }
 
-void Camera::UpdateMatrix() {
+void Camera::UpdateMatrixFromEuler() {
 	//ビュー行列の計算
-	Camera::UpdateViewMatrix();
+	Camera::UpdateViewMatrixFromEuler();
+	//プロジェクション行列の計算
+	Camera::UpdateProjectionMatrix();
+	//ビュープロジェクションを転送する
+	Camera::TransferMatrix();
+}
+
+void Camera::UpdateMatrixFromQuaternion() {
+	//ビュー行列の計算
+	Camera::UpdateViewMatrixFromQuaternion();
 	//プロジェクション行列の計算
 	Camera::UpdateProjectionMatrix();
 	//ビュープロジェクションを転送する
