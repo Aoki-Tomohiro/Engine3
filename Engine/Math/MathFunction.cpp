@@ -56,7 +56,7 @@ float Dot(const Vector3& v1, const Vector3& v2) {
 
 float Length(const Vector3& v) {
 	float result{};
-	result = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+	result = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 	return result;
 }
 
@@ -64,7 +64,7 @@ float Length(const Vector3& v) {
 Vector3 Normalize(const Vector3& v) {
 	Vector3 result{};
 
-	float date = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+	float date = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 	if (date != 0) {
 		result.x = v.x / date;
 		result.y = v.y / date;
