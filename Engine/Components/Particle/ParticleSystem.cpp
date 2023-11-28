@@ -36,7 +36,7 @@ void ParticleSystem::Initialize() {
 	//インスタンシング用のリソースの作成
 	CreateInstancingResource();
 	//SRVの作成
-	srvIndex_ = TextureManager::GetInstance()->CreateInstancingShaderResourceView(*instancingResource_.get(), kMaxInstance, sizeof(ParticleForGPU));
+	srvHandleGpu_ = TextureManager::GetInstance()->CreateInstancingShaderResourceView(*instancingResource_.get(), kMaxInstance, sizeof(ParticleForGPU));
 
 	//テクスチャの読み込み
 	textureHandle_ = TextureManager::Load("Resources/Images/circle.png");
@@ -72,7 +72,7 @@ void ParticleSystem::Draw(const Camera& camera) {
 	//マテリアルCBufferの場所を設定
 	sCommandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//WorldTransform用のCBufferの場所を設定
-	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(1, srvIndex_);
+	sCommandList_->SetGraphicsRootDescriptorTable(1, srvHandleGpu_);
 	//ViewProjection用のCBufferの場所を設定
 	sCommandList_->SetGraphicsRootConstantBufferView(2, camera.GetConstantBuffer()->GetGPUVirtualAddress());
 	//DescriptorTableを設定
@@ -102,7 +102,7 @@ void ParticleSystem::CreateVertexBuffer() {
 void ParticleSystem::CreateMaterialResource() {
 	//マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
 	materialResource_ = std::make_unique<UploadBuffer>();
-	vertexBuffer_->Create(sizeof(MaterialData));
+	materialResource_->Create(sizeof(MaterialData));
 	//マテリアルにデータを書き込む
 	materialData_ = static_cast<MaterialData*>(materialResource_->Map());
 	//今回は赤を書き込んでみる
@@ -114,7 +114,7 @@ void ParticleSystem::CreateMaterialResource() {
 void ParticleSystem::CreateInstancingResource() {
 	//Instancing用のWorldTransformリソースを作る
 	instancingResource_ = std::make_unique<UploadBuffer>();
-	vertexBuffer_->Create(sizeof(ParticleForGPU) * kMaxInstance);
+	instancingResource_->Create(sizeof(ParticleForGPU) * kMaxInstance);
 	//書き込むためのアドレスを取得
 	instancingData_ = static_cast<ParticleForGPU*>(instancingResource_->Map());
 	//単位行列を書き込んでおく
@@ -147,8 +147,8 @@ void ParticleSystem::UpdateInstancingResource(const Camera& camera) {
 			Matrix4x4 translateMatrix = MakeTranslateMatrix(particleIterator->get()->GetTranslation());
 			Matrix4x4 worldMatrix = Multiply(scaleMatrix, Multiply(billboardMatrix, translateMatrix));
 			if (numInstance_ < kMaxInstance) {
-				instancingData[numInstance_].world = worldMatrix;
-				instancingData[numInstance_].color = particleIterator->get()->GetColor();
+				instancingData_[numInstance_].world = worldMatrix;
+				instancingData_[numInstance_].color = particleIterator->get()->GetColor();
 				numInstance_++;
 			}
 			++particleIterator;

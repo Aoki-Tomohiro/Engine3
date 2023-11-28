@@ -70,10 +70,10 @@ uint32_t SRVHeap::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Re
 	return index_;
 }
 
-uint32_t SRVHeap::CreateInstancingShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& instancingResource, uint32_t kNumInstance, size_t size) {
+D3D12_GPU_DESCRIPTOR_HANDLE SRVHeap::CreateInstancingShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& instancingResource, uint32_t kNumInstance, size_t size) {
 	index_++;
 	//ディスクリプタの最大数を超えていたら止める
-	if (index_ < numDescriptors_) {
+	if (index_ > numDescriptors_) {
 		assert(false);
 	}
 
@@ -86,8 +86,9 @@ uint32_t SRVHeap::CreateInstancingShaderResourceView(const Microsoft::WRL::ComPt
 	instancingSrvDesc.Buffer.NumElements = kNumInstance;
 	instancingSrvDesc.Buffer.StructureByteStride = UINT(size);
 
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = GetCPUDescriptorHandle(index_);
-	device_->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, srvHandle);
+	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCpu = GetCPUDescriptorHandle(index_);
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGpu = GetGPUDescriptorHandle(index_);
+	device_->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, srvHandleCpu);
 
-	return index_;
+	return srvHandleGpu;
 }

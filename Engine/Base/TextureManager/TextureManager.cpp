@@ -49,10 +49,16 @@ void TextureManager::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uin
 	commandList_->SetGraphicsRootDescriptorTable(rootParameterIndex, textures_[textureHandle].resource->GetGpuHandle());
 }
 
-uint32_t TextureManager::CreateInstancingShaderResourceView(UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size) {
+D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::CreateInstancingShaderResourceView(UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size) {
+	//テクスチャハンドルをインクリメント
 	textureHandle_++;
-	srvDescriptorHeap_->CreateInstancingShaderResourceView(instancingResource.GetResource(), kNumInstance, size);
-	return textureHandle_;
+	//テクスチャがディスクリプタの最大数を超えていたら止める
+	if (textureHandle_ >= kNumDescriptors) {
+		assert(0);
+	}
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGpu = srvDescriptorHeap_->CreateInstancingShaderResourceView(instancingResource.GetResource(), kNumInstance, size);
+	textures_[textureHandle_].name = "instancingResource";
+	return srvHandleGpu;
 }
 
 const D3D12_RESOURCE_DESC TextureManager::GetResourceDesc(uint32_t textureHandle) {
@@ -65,14 +71,10 @@ const D3D12_RESOURCE_DESC TextureManager::GetResourceDesc(uint32_t textureHandle
 
 uint32_t TextureManager::LoadInternal(const std::string& filePath) {
 	//同じテクスチャがないか探す
-	auto it = std::find_if(textures_.begin(), textures_.end(), [&](const Texture& texture) {
-		return texture.name == filePath;
-	});
-
-	//同じテクスチャがあったらそのインデックスを返す
-	if (it != textures_.end()) {
-		uint32_t index = static_cast<uint32_t>(std::distance(textures_.begin(), it));
-		return index;
+	for (Texture& texture : textures_) {
+		if (texture.name == filePath) {
+			return texture.textureHandle;
+		}
 	}
 
 	//テクスチャハンドルをインクリメント
@@ -102,6 +104,7 @@ uint32_t TextureManager::LoadInternal(const std::string& filePath) {
 
 	//テクスチャの名前を保存する
 	textures_[textureHandle_].name = filePath;
+	textures_[textureHandle_].textureHandle = textureHandle_;
 
 	return textureHandle_;
 }

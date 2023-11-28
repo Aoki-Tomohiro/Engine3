@@ -56,12 +56,6 @@ public:
 	void AddParticleEmitter(ParticleEmitter* particleEmitter) { particleEmitters_.push_back(std::unique_ptr<ParticleEmitter>(particleEmitter)); };
 
 	/// <summary>
-	/// GPUハンドルを取得
-	/// </summary>
-	/// <returns></returns>
-	const uint32_t& GetSrvIndex() const { return srvIndex_; };
-
-	/// <summary>
 	/// インスタンス数を取得
 	/// </summary>
 	/// <returns></returns>
@@ -120,13 +114,12 @@ private:
 	std::vector<VertexData> vertices_{};
 	//頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+	//Instancing用のSRVの番号
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGpu_{};
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0;
-	//Instancing用のSRVの番号
-	uint32_t srvIndex_ = 0;
 	//エミッターのリスト
 	std::list<std::unique_ptr<ParticleEmitter>> particleEmitters_{};
 	//インスタンス数
 	uint32_t numInstance_ = 0;
 };
-
