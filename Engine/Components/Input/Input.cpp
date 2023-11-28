@@ -37,6 +37,10 @@ void Input::Initialize() {
 	result = mouseDevice_->SetCooperativeLevel(
 		app_->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	assert(SUCCEEDED(result));
+
+	//コントローラーデバイスの初期化
+	ZeroMemory(&state_, sizeof(XINPUT_STATE));
+	ZeroMemory(&preState_, sizeof(XINPUT_STATE));
 }
 
 void Input::Update() {
@@ -44,6 +48,8 @@ void Input::Update() {
 	std::memcpy(preKey_, key_, 256);
 	//前のフレームのマウス入力を取得する
 	mousePre_ = mouse_;
+	//前のフレームのコントローラー入力を取得する
+	preState_ = state_;
 
 	//キーボード情報の取得開始
 	keyboardDevice_->Acquire();
@@ -54,6 +60,12 @@ void Input::Update() {
 	keyboardDevice_->GetDeviceState(sizeof(key_), key_);
 	//マウスの入力状態を取得する
 	mouseDevice_->GetDeviceState(sizeof(DIMOUSESTATE), &mouse_);
+
+	//コントローラーの状態を取得
+	DWORD dwResult = XInputGetState(0, &state_);
+	if (dwResult == ERROR_SUCCESS) {
+		ZeroMemory(&state_, sizeof(XINPUT_STATE));
+	}
 }
 
 bool Input::IsPushKey(uint8_t keyNum) {
@@ -102,10 +114,51 @@ int32_t Input::GetWheel() {
 	return mouse_.lZ;
 }
 
-bool Input::GetJoystickState(XINPUT_STATE& state) {
-	DWORD dwResult = XInputGetState(0, &state);
+bool Input::IsControllerConnected() {
+	DWORD dwResult = XInputGetState(0, &state_);
 	if (dwResult == ERROR_SUCCESS) {
 		return true;
 	}
 	return false;
+}
+
+bool Input::IsPressButton(WORD button) {
+	if (state_.Gamepad.wButtons & button) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::IsPressButtonEnter(WORD button) {
+	if ((state_.Gamepad.wButtons & button) && !(preState_.Gamepad.wButtons & button)) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::IsPressButtonExit(WORD button) {
+	if (!(state_.Gamepad.wButtons & button) && (preState_.Gamepad.wButtons & button)) {
+		return true;
+	}
+	return false;
+}
+
+float Input::GetLeftStickX() {
+	float leftStickXValue = static_cast<float>(state_.Gamepad.sThumbLX) / SHRT_MAX;
+	return leftStickXValue;
+}
+
+float Input::GetLeftStickY() {
+	float leftStickYValue = static_cast<float>(state_.Gamepad.sThumbLY) / SHRT_MAX;
+	return leftStickYValue;
+}
+
+float Input::GetRightStickX() {
+	float rightStickXValue = static_cast<float>(state_.Gamepad.sThumbRX) / SHRT_MAX;
+	return rightStickXValue;
+}
+
+float Input::GetRightStickY() {
+	float rightStickYValue = static_cast<float>(state_.Gamepad.sThumbRY) / SHRT_MAX;
+	return rightStickYValue;
 }

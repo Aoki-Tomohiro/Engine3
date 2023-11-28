@@ -80,10 +80,55 @@ public:
 	int32_t GetWheel();
 
 	/// <summary>
-	/// コントローラーの状態を取得
+	/// コントローラーが接続されているかを判定
 	/// </summary>
 	/// <returns></returns>
-	bool GetJoystickState(XINPUT_STATE& state);
+	bool IsControllerConnected();
+
+	/// <summary>
+	/// ボタンが押されているかを判定
+	/// </summary>
+	/// <param name="button"></param>
+	/// <returns></returns>
+	bool IsPressButton(WORD button);
+
+	/// <summary>
+	/// ボタンが押された瞬間を判定
+	/// </summary>
+	/// <param name="button"></param>
+	/// <returns></returns>
+	bool IsPressButtonEnter(WORD button);
+
+	/// <summary>
+	/// ボタンが離された瞬間を判定
+	/// </summary>
+	/// <param name="button"></param>
+	/// <returns></returns>
+	bool IsPressButtonExit(WORD button);
+
+	/// <summary>
+	/// 左スティックのX軸の値を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetLeftStickX();
+
+	/// <summary>
+	/// 左スティックのY軸の値を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetLeftStickY();
+
+	/// <summary>
+	/// 右スティックのX軸の値を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetRightStickX();
+
+	/// <summary>
+	/// 右スティックのY軸の値を取得
+	/// </summary>
+	/// <returns></returns>
+	float GetRightStickY();
 
 private:
 	Input() = default;
@@ -110,4 +155,6 @@ private:
 	DIMOUSESTATE mousePre_ = {};
 	//コントローラーの情報
 	XINPUT_STATE state_{};
+	//前のフレームのコントローラーの情報
+	XINPUT_STATE preState_{};
 };
