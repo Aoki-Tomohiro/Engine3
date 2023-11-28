@@ -33,22 +33,34 @@ void FollowCamera::Update() {
 		//追従対象からロックオン座標へのベクトル
 		Vector3 sub = Subtract(lockOnPosition, GetTargetWorldPosition());
 
+		////Y軸周り角度
+		//sub = Normalize(sub);
+		//float dot = Dot({ 0.0f,0.0f,1.0f }, sub);
+		//float length = Length(sub);
+		//float angle = 0.0f;
+		//if (dot <= -1.0) {
+		//	angle = std::numbers::pi_v<float>;
+		//}
+		//else if (dot >= 1.0) {
+		//	angle = 0.0f;
+		//}
+		//else {
+		//	angle = std::acos(dot / length);
+		//}
+		//
+		//destinationAngleY_ = (sub.x >= 0.0f) ? angle : -angle;
+
 		//Y軸周り角度
-		sub = Normalize(sub);
-		float dot = Dot({ 0.0f,0.0f,1.0f }, sub);
-		float length = Length(sub);
-		float angle = 0.0f;
-		if (dot <= -1.0) {
-			angle = std::numbers::pi_v<float>;
-		}
-		else if (dot >= 1.0) {
-			angle = 0.0f;
+		if (sub.z != 0.0) {
+			destinationAngleY_ = std::asin(sub.x / std::sqrt(sub.x * sub.x + sub.z * sub.z));
+
+			if (sub.z < 0.0) {
+				destinationAngleY_ = (sub.x >= 0.0) ? std::numbers::pi_v<float> -destinationAngleY_ : -std::numbers::pi_v<float> -destinationAngleY_;
+			}
 		}
 		else {
-			angle = std::acos(dot);
+			destinationAngleY_ = (sub.x >= 0.0) ? std::numbers::pi_v<float> / 2.0f : -std::numbers::pi_v<float> / 2.0f;
 		}
-		
-		destinationAngleY_ = (sub.x >= 0.0f) ? angle : -angle;
 	}
 	else {
 		//旋回操作
