@@ -54,11 +54,14 @@ bool LockOn::InRange(const Camera& camera) {
 
 	//距離条件チェック
 	if (minDistance_ <= positionView.z && positionView.z <= maxDistance_) {
-		//カメラ前方との角度を計算
-		float arcTangent = std::atan2(std::sqrt(positionView.x * positionView.x + positionView.y * positionView.y), positionView.z);
+		////カメラ前方との角度を計算
+		//float arcTangent = std::atan2(std::sqrt(positionView.x * positionView.x + positionView.y * positionView.y), positionView.z);
+		float dot = Dot({ 0.0f,0.0f,1.0f }, positionView);
+		float length = Length(positionView);
+		float angle = std::acos(dot / length);
 
 		//角度条件チェック(コーンに収まっているか)
-		if (std::abs(arcTangent) <= angleRange_) {
+		if (std::abs(angle) <= angleRange_) {
 			return false;
 		}
 	}
@@ -155,11 +158,12 @@ void LockOn::SearchLockOnTarget(const std::list<std::unique_ptr<Enemy>>& enemies
 		if (minDistance_ <= positionView.z && positionView.z <= maxDistance_) {
 			//カメラ前方との角度を計算
 			//float arcTangent = std::atan2(std::sqrt(positionView.x * positionView.x + positionView.y * positionView.y), positionView.z);
-			float norm = Length(positionView);
-			float arcTangent = std::acos(positionView.z / norm);
+			float dot = Dot({ 0.0f,0.0f,1.0f }, positionView);
+			float length = Length(positionView);
+			float angle = std::acos(dot / length);
 
 			//角度条件チェック(コーンに収まっているか)
-			if (std::abs(arcTangent) <= angleRange_ && enemy->GetIsDead() == false) {
+			if (std::abs(angle) <= angleRange_ && enemy->GetIsDead() == false) {
 				targets_.emplace_back(std::make_pair(positionView.z, enemy.get()));
 			}
 		}

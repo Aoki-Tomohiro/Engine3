@@ -1,6 +1,7 @@
 #include "FollowCamera.h"
 #include "Engine/Utilities/GlobalVariables.h"
 #include "Project/GameObject/LockOn/LockOn.h"
+#include <numbers>
 
 void FollowCamera::Initialize() {
 	//ビュープロジェクションの初期化
@@ -33,7 +34,21 @@ void FollowCamera::Update() {
 		Vector3 sub = Subtract(lockOnPosition, GetTargetWorldPosition());
 
 		//Y軸周り角度
-		destinationAngleY_ = std::atan2(sub.x, sub.z);
+		sub = Normalize(sub);
+		float dot = Dot({ 0.0f,0.0f,1.0f }, sub);
+		float length = Length(sub);
+		float angle = 0.0f;
+		if (dot <= -1.0) {
+			angle = std::numbers::pi_v<float>;
+		}
+		else if (dot >= 1.0) {
+			angle = 0.0f;
+		}
+		else {
+			angle = std::acos(dot);
+		}
+		
+		destinationAngleY_ = (sub.x >= 0.0f) ? angle : -angle;
 	}
 	else {
 		//旋回操作

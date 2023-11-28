@@ -122,6 +122,16 @@ void GameScene::Update() {
 	if (player_->GetIsDead()) {
 		Reset();
 	}
+
+	ImGui::Begin("GameScene");
+	ImGui::Text("Left Stick : Move");
+	ImGui::Text("Right Stick : CameraMove");
+	ImGui::Text("Push Right Stick : LockOn");
+	ImGui::Text("RB : Attack");
+	ImGui::Text("A : Jump");
+	ImGui::Text("X : Dash");
+	ImGui::Text("B : TargetChange");
+	ImGui::End();
 }
 
 void GameScene::Draw() {
