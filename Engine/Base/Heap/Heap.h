@@ -1,8 +1,13 @@
 #pragma once
 #include "Engine/Base/GraphicsCore/GraphicsCore.h"
 
-class DescriptorHeap {
+class Heap {
 public:
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~Heap() = default;
+
 	/// <summary>
 	/// 初期化
 	/// </summary>

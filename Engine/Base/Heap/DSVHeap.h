@@ -1,7 +1,7 @@
 #pragma once
-#include "DescriptorHeap.h"
+#include "Heap.h"
 
-class DSVHeap : public DescriptorHeap {
+class DSVHeap : public Heap {
 public:
 	/// <summary>
 	/// 初期化

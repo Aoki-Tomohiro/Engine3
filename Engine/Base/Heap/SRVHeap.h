@@ -1,7 +1,7 @@
 #pragma once
-#include "DescriptorHeap.h"
+#include "Heap.h"
 
-class SRVHeap : public DescriptorHeap {
+class SRVHeap : public Heap {
 public:
 	/// <summary>
 	/// 初期化

@@ -55,18 +55,6 @@
     <Filter Include="ソース ファイル\Engine\Utilities">
       <UniqueIdentifier>{6cb385f4-7b4f-4567-bf22-ec26cdf6beb9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\Engine\Base\Heaps">
-      <UniqueIdentifier>{5c1d2e1d-7e15-428b-8964-5f1b41d8faec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Engine\Base\Buffers">
-      <UniqueIdentifier>{99a05c3a-1ee9-4bba-b96d-70d913127b81}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Engine\Base\Heaps">
-      <UniqueIdentifier>{cac7ccb6-b4d1-453c-8496-3b6cb1b001ed}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Engine\Base\Buffers">
-      <UniqueIdentifier>{adcb103e-c807-4a42-8fc2-f0973cb729c5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\Engine\Components\Particle">
       <UniqueIdentifier>{0fe8761f-0c54-401b-8868-57da5651ea91}</UniqueIdentifier>
     </Filter>
@@ -202,6 +190,18 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{5f584ea9-d740-436c-a1e2-27bcd1b8e413}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Base\Heap">
+      <UniqueIdentifier>{5c1d2e1d-7e15-428b-8964-5f1b41d8faec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Base\Buffer">
+      <UniqueIdentifier>{99a05c3a-1ee9-4bba-b96d-70d913127b81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Base\Heap">
+      <UniqueIdentifier>{cac7ccb6-b4d1-453c-8496-3b6cb1b001ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Base\Buffer">
+      <UniqueIdentifier>{adcb103e-c807-4a42-8fc2-f0973cb729c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -257,27 +257,6 @@
     </ClCompile>
     <ClCompile Include="Engine\Components\Audio\Audio.cpp">
       <Filter>ソース ファイル\Engine\Components\Audio</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Base\Buffers\ColorBuffer.cpp">
-      <Filter>ソース ファイル\Engine\Base\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Base\Buffers\DepthBuffer.cpp">
-      <Filter>ソース ファイル\Engine\Base\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Base\Buffers\TextureResource.cpp">
-      <Filter>ソース ファイル\Engine\Base\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Base\Buffers\UploadBuffer.cpp">
-      <Filter>ソース ファイル\Engine\Base\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Base\Heaps\DSVHeap.cpp">
-      <Filter>ソース ファイル\Engine\Base\Heaps</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Base\Heaps\RTVHeap.cpp">
-      <Filter>ソース ファイル\Engine\Base\Heaps</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Base\Heaps\SRVHeap.cpp">
-      <Filter>ソース ファイル\Engine\Base\Heaps</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Base\ImGuiManager\ImGuiManager.cpp">
       <Filter>ソース ファイル\Engine\Base\ImGuiManager</Filter>
@@ -338,6 +317,27 @@
     </ClCompile>
     <ClCompile Include="Engine\Base\GraphicsCore\GraphicsCore.cpp">
       <Filter>ソース ファイル\Engine\Base\GraphicsCore</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Heap\SRVHeap.cpp">
+      <Filter>ソース ファイル\Engine\Base\Heap</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Heap\RTVHeap.cpp">
+      <Filter>ソース ファイル\Engine\Base\Heap</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Heap\DSVHeap.cpp">
+      <Filter>ソース ファイル\Engine\Base\Heap</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Buffer\UploadBuffer.cpp">
+      <Filter>ソース ファイル\Engine\Base\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Buffer\TextureResource.cpp">
+      <Filter>ソース ファイル\Engine\Base\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Buffer\DepthBuffer.cpp">
+      <Filter>ソース ファイル\Engine\Base\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Buffer\ColorBuffer.cpp">
+      <Filter>ソース ファイル\Engine\Base\Buffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -428,33 +428,6 @@
     <ClInclude Include="Engine\Components\Audio\Audio.h">
       <Filter>ヘッダー ファイル\Engine\Components\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Base\Buffers\UploadBuffer.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Buffers\TextureResource.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Buffers\GpuResource.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Buffers\DepthBuffer.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Buffers\ColorBuffer.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Heaps\SRVHeap.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Heaps</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Heaps\RTVHeap.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Heaps</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Heaps\DSVHeap.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Heaps</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Heaps\DescriptorHeap.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Heaps</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Base\ImGuiManager\ImGuiManager.h">
       <Filter>ヘッダー ファイル\Engine\Base\ImGuiManager</Filter>
     </ClInclude>
@@ -517,6 +490,33 @@
     </ClInclude>
     <ClInclude Include="Engine\Base\GraphicsCore\GraphicsCore.h">
       <Filter>ヘッダー ファイル\Engine\Base\GraphicsCore</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Heap\DSVHeap.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Heap\Heap.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Heap\RTVHeap.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Heap\SRVHeap.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\ColorBuffer.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\DepthBuffer.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\GpuResource.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\TextureResource.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\UploadBuffer.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

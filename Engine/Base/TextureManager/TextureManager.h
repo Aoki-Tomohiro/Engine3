@@ -1,7 +1,7 @@
 #pragma once
-#include "Engine/Base/Heaps/SRVHeap.h"
-#include "Engine/Base/Buffers/TextureResource.h"
-#include "Engine/Base/Buffers/UploadBuffer.h"
+#include "Engine/Base/Heap/SRVHeap.h"
+#include "Engine/Base/Buffer/TextureResource.h"
+#include "Engine/Base/Buffer/UploadBuffer.h"
 #include <array>
 
 class TextureManager {

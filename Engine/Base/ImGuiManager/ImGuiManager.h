@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Base/GraphicsCore/GraphicsCore.h"
-#include "Engine/Base/Heaps/SRVHeap.h"
+#include "Engine/Base/Heap/SRVHeap.h"
 #include "Engine/Externals/imgui/imgui.h"
 #include "Engine/Externals/imgui/imgui_impl_dx12.h"
 #include <memory>
@@ -50,6 +50,6 @@ private:
 	//DirectXCommon
 	GraphicsCore* core_ = nullptr;
 	//SRV用ヒープ
-	std::unique_ptr<DescriptorHeap> srvDescriptorHeap_ = nullptr;
+	std::unique_ptr<SRVHeap> srvDescriptorHeap_ = nullptr;
 };
 
