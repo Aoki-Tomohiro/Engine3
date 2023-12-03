@@ -2,8 +2,9 @@
 
 void Camera::Initialize() {
 	//CBVの作成
+	ID3D12Device* device = GraphicsCore::GetInstance()->GetDevice();
 	constBuff_ = std::make_unique<UploadBuffer>();
-	constBuff_->Create(sizeof(ConstBuffDataViewProjection));
+	constBuff_->Create(device, sizeof(ConstBuffDataViewProjection));
 }
 
 void Camera::TransferMatrix() {
@@ -14,7 +15,7 @@ void Camera::TransferMatrix() {
 	constBuff_->Unmap();
 }
 
-void Camera::UpdateViewMatrixFromEuler() {
+void Camera::UpdateViewMatrix() {
 	//平行移動行列の計算
 	Matrix4x4 translateMatrix = MakeTranslateMatrix(translation_);
 	//回転行列の計算
@@ -26,32 +27,14 @@ void Camera::UpdateViewMatrixFromEuler() {
 	matView_ = Multiply(Inverse(translateMatrix), Inverse(rotateMatrix));
 }
 
-void Camera::UpdateViewMatrixFromQuaternion() {
-	//平行移動行列の計算
-	Matrix4x4 translateMatrix = MakeTranslateMatrix(translation_);
-	//回転行列の計算
-	Matrix4x4 rotateMatrix = MakeRotateMatrix(quaternion_);
-	//ビュー行列の計算
-	matView_ = Multiply(Inverse(translateMatrix), Inverse(rotateMatrix));
-}
-
 void Camera::UpdateProjectionMatrix() {
 	//プロジェクション行列の計算
 	matProjection_ = MakePerspectiveFovMatrix(fov_, aspectRatio_, nearClip_, farClip_);
 }
 
-void Camera::UpdateMatrixFromEuler() {
+void Camera::UpdateMatrix() {
 	//ビュー行列の計算
-	Camera::UpdateViewMatrixFromEuler();
-	//プロジェクション行列の計算
-	Camera::UpdateProjectionMatrix();
-	//ビュープロジェクションを転送する
-	Camera::TransferMatrix();
-}
-
-void Camera::UpdateMatrixFromQuaternion() {
-	//ビュー行列の計算
-	Camera::UpdateViewMatrixFromQuaternion();
+	Camera::UpdateViewMatrix();
 	//プロジェクション行列の計算
 	Camera::UpdateProjectionMatrix();
 	//ビュープロジェクションを転送する

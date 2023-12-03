@@ -1,10 +1,13 @@
 #include "Sprite.h"
 
 //実体定義
+ID3D12Device* Sprite::sDevice_ = nullptr;
 ID3D12GraphicsCommandList* Sprite::sCommandList_ = nullptr;
 Matrix4x4 Sprite::sMatProjection_{};
 
 void Sprite::StaticInitialize() {
+	//デバイスの取得
+	sDevice_ = GraphicsCore::GetInstance()->GetDevice();
 	//コマンドリストの取得
 	sCommandList_ = GraphicsCore::GetInstance()->GetCommandList();
 	//平行投影行列の作成
@@ -106,7 +109,7 @@ void Sprite::Initialize(uint32_t textureHandle, Vector2 position) {
 void Sprite::CreateVertexBuffer() {
 	//頂点リソースを作る
 	vertexBuffer_ = std::make_unique<UploadBuffer>();
-	vertexBuffer_->Create(sizeof(VertexData) * 6);
+	vertexBuffer_->Create(sDevice_, sizeof(VertexData) * 6);
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点6つ分のサイズ
@@ -164,7 +167,7 @@ void Sprite::UpdateVertexBuffer() {
 void Sprite::CreateMaterialResource() {
 	//マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
 	materialResource_ = std::make_unique<UploadBuffer>();
-	materialResource_->Create(sizeof(MaterialData));
+	materialResource_->Create(sDevice_,sizeof(MaterialData));
 	//マテリアルにデータを書き込む
 	materialData_ = static_cast<MaterialData*>(materialResource_->Map());
 	//今回は赤を書き込んでみる
@@ -188,7 +191,7 @@ void Sprite::UpdateMaterial() {
 void Sprite::CreateWVPResource() {
 	//WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	wvpResource_ = std::make_unique<UploadBuffer>();
-	wvpResource_->Create(sizeof(Matrix4x4));
+	wvpResource_->Create(sDevice_, sizeof(Matrix4x4));
 	//データを書き込む
 	wvpData_ = static_cast<Matrix4x4*>(wvpResource_->Map());
 	//単位行列を書き込んでおく

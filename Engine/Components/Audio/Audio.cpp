@@ -116,11 +116,11 @@ void Audio::SoundUnload(SoundData* soundData) {
 	soundData->wfex = {};
 }
 
-void Audio::SoundPlayWave(uint32_t audioHandle, bool roopFlag, float volume) {
+uint32_t Audio::SoundPlayWave(uint32_t audioHandle, bool loopFlag, float volume) {
+	HRESULT result;
 	//voiceHandleをインクリメント
 	voiceHandle_++;
 
-	HRESULT result;
 	//波形フォーマットを元にSourceVoiceの作成
 	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	result = xAudio2_->CreateSourceVoice(&pSourceVoice, &soundDatas_[audioHandle].wfex);
@@ -128,7 +128,7 @@ void Audio::SoundPlayWave(uint32_t audioHandle, bool roopFlag, float volume) {
 
 	//コンテナに追加
 	Voice* voice = new Voice();
-	voice->handle = voiceHandle_;
+	voice->handle = audioHandle;
 	voice->sourceVoice = pSourceVoice;
 	sourceVoices_.insert(voice);
 
@@ -137,7 +137,7 @@ void Audio::SoundPlayWave(uint32_t audioHandle, bool roopFlag, float volume) {
 	buf.pAudioData = soundDatas_[audioHandle].pBuffer;
 	buf.AudioBytes = soundDatas_[audioHandle].bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
-	if (roopFlag) {
+	if (loopFlag) {
 		buf.LoopCount = XAUDIO2_LOOP_INFINITE;
 	}
 
@@ -145,13 +145,21 @@ void Audio::SoundPlayWave(uint32_t audioHandle, bool roopFlag, float volume) {
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
 	pSourceVoice->SetVolume(volume);
 	result = pSourceVoice->Start();
+
+	return voiceHandle_;
 }
 
-void Audio::StopAudio(uint32_t audioHandle) {
+void Audio::StopAudio(uint32_t voiceHandle) {
 	HRESULT result;
-	for (const Voice* voice : sourceVoices_) {
-		if (voice->handle == audioHandle) {
-			result = voice->sourceVoice->Stop();
+	auto it = sourceVoices_.begin();
+	while (it != sourceVoices_.end()) {
+		if ((*it)->handle == voiceHandle) {
+			result = (*it)->sourceVoice->Stop();
+			delete (*it);
+			it = sourceVoices_.erase(it);
+		}
+		else {
+			++it;
 		}
 	}
 }

@@ -3,11 +3,15 @@
 
 class RTVHeap : public Heap {
 public:
+	//インクリメントサイズ
+	static uint32_t descriptorSizeRTV;
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
+	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	void Initialize(UINT numDescriptors) override;
+	void Initialize(ID3D12Device* device, UINT numDescriptors) override;
 	
 	/// <summary>
 	/// CPUディスクリプタハンドルを取得

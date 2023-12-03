@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Base/GraphicsCore/GraphicsCore.h"
 #include "Engine/Base/Buffer/UploadBuffer.h"
 #include "Engine/Math/MathFunction.h"
 
@@ -17,12 +18,7 @@ public:
 	/// <summary>
 	/// ビュー行列の更新
 	/// </summary>
-	void UpdateViewMatrixFromEuler();
-
-	/// <summary>
-	/// ビュー行列の更新
-	/// </summary>
-	void UpdateViewMatrixFromQuaternion();
+	void UpdateViewMatrix();
 
 	/// <summary>
 	/// プロジェクション行列の更新
@@ -32,12 +28,7 @@ public:
 	/// <summary>
 	/// 行列の計算
 	/// </summary>
-	void UpdateMatrixFromEuler();
-
-	/// <summary>
-	/// 行列の計算
-	/// </summary>
-	void UpdateMatrixFromQuaternion();
+	void UpdateMatrix();
 
 	/// <summary>
 	/// CBVを転送
@@ -61,8 +52,6 @@ public:
 	Vector3 rotation_ = { 0.0f,0.0f,0.0f };
 	//座標
 	Vector3 translation_ = { 0.0f,0.0f,-50.0f };
-	//クォータニオン
-	Quaternion quaternion_ = { 0.0f,0.0f,0.0f,1.0f };
 	//ビュー行列
 	Matrix4x4 matView_{};
 	//プロジェクション行列

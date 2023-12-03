@@ -13,8 +13,9 @@ public:
 	/// <summary>
 	/// 作成
 	/// </summary>
+	/// <param name="device"></param>
 	/// <param name="metadata"></param>
-	void Create(const DirectX::TexMetadata& metadata);
+	void Create(ID3D12Device* device, const DirectX::TexMetadata& metadata);
 
 	/// <summary>
 	/// Cpuハンドルを取得

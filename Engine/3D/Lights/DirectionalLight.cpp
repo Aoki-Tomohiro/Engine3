@@ -2,8 +2,9 @@
 
 void DirectionalLight::Initialize() {
 	//lightingResourceの作成
+	ID3D12Device* device = GraphicsCore::GetInstance()->GetDevice();
 	lightingResource_ = std::make_unique<UploadBuffer>();
-	lightingResource_->Create(sizeof(ConstBufferDataDirectionalLight));
+	lightingResource_->Create(device, sizeof(ConstBufferDataDirectionalLight));
 
 	//lightingResourceに書き込む
 	directionalLightData_ = static_cast<ConstBufferDataDirectionalLight*>(lightingResource_->Map());

@@ -1,9 +1,11 @@
 #include "Material.h"
+#include "Engine/Base/GraphicsCore/GraphicsCore.h"
 
 void Material::Initialize() {
 	//マテリアルリソースの作成
+	ID3D12Device* device = GraphicsCore::GetInstance()->GetDevice();
 	materialResource_ = std::make_unique<UploadBuffer>();
-	materialResource_->Create(sizeof(ConstBufferDataMaterial));
+	materialResource_->Create(device, sizeof(ConstBufferDataMaterial));
 
 	//マテリアルリソースに書き込む
 	materialData_ = static_cast<ConstBufferDataMaterial*>(materialResource_->Map());

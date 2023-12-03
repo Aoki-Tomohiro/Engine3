@@ -1,13 +1,16 @@
 #include "ParticleSystem.h"
+#include "Engine/Base/GraphicsCore/GraphicsCore.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 
 //実体定義
 ParticleSystem* ParticleSystem::instance_ = nullptr;
+ID3D12Device* ParticleSystem::sDevice_ = nullptr;
 ID3D12GraphicsCommandList* ParticleSystem::sCommandList_ = nullptr;
 
 void ParticleSystem::StaticInitialize() {
 	//コマンドリストの取得
 	sCommandList_ = GraphicsCore::GetInstance()->GetCommandList();
+	sDevice_ = GraphicsCore::GetInstance()->GetDevice();
 }
 
 void ParticleSystem::Initialize() {
@@ -84,7 +87,7 @@ void ParticleSystem::Draw(const Camera& camera) {
 void ParticleSystem::CreateVertexBuffer() {
 	//頂点リソースを作る
 	vertexBuffer_ = std::make_unique<UploadBuffer>();
-	vertexBuffer_->Create(sizeof(VertexData) * vertices_.size());
+	vertexBuffer_->Create(sDevice_, sizeof(VertexData) * vertices_.size());
 
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
@@ -102,7 +105,7 @@ void ParticleSystem::CreateVertexBuffer() {
 void ParticleSystem::CreateMaterialResource() {
 	//マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
 	materialResource_ = std::make_unique<UploadBuffer>();
-	materialResource_->Create(sizeof(MaterialData));
+	materialResource_->Create(sDevice_,sizeof(MaterialData));
 	//マテリアルにデータを書き込む
 	materialData_ = static_cast<MaterialData*>(materialResource_->Map());
 	//今回は赤を書き込んでみる
@@ -114,7 +117,7 @@ void ParticleSystem::CreateMaterialResource() {
 void ParticleSystem::CreateInstancingResource() {
 	//Instancing用のWorldTransformリソースを作る
 	instancingResource_ = std::make_unique<UploadBuffer>();
-	instancingResource_->Create(sizeof(ParticleForGPU) * kMaxInstance);
+	instancingResource_->Create(sDevice_,sizeof(ParticleForGPU) * kMaxInstance);
 	//書き込むためのアドレスを取得
 	instancingData_ = static_cast<ParticleForGPU*>(instancingResource_->Map());
 	//単位行列を書き込んでおく

@@ -1,5 +1,9 @@
 #pragma once
 #include "Engine/Base/Windows/Application.h"
+#include "Engine/Base/Heap/RTVHeap.h"
+#include "Engine/Base/Heap/DSVHeap.h"
+#include "Engine/Base/Buffer/ColorBuffer.h"
+#include "Engine/Base/Buffer/DepthBuffer.h"
 #include "Engine/Utilities/Log.h"
 #include <chrono>
 #include <d3d12.h>
@@ -10,19 +14,8 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"winmm.lib")
 
-class RTVHeap;
-class DSVHeap;
-class GpuResource;
-class ColorBuffer;
-class DepthBuffer;
-
 class GraphicsCore {
 public:
-	//インクリメントサイズ
-	static uint32_t descriptorSizeRTV;
-	static uint32_t descriptorSizeDSV;
-	static uint32_t descriptorSizeSRV;
-
 	/// <summary>
 	/// シングルトンインスタンスの取得
 	/// </summary>
@@ -103,11 +96,6 @@ private:
 	/// フェンスの作成
 	/// </summary>
 	void CreateFence();
-
-	/// <summary>
-	/// ディスクリプタサイズの初期化
-	/// </summary>
-	void InitializeDescriptorSizes();
 
 	/// <summary>
 	/// ディスクリプタヒープの作成

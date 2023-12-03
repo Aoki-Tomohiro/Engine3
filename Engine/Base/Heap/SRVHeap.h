@@ -3,11 +3,15 @@
 
 class SRVHeap : public Heap {
 public:
+	//インクリメントサイズ
+	static uint32_t descriptorSizeSRV;
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
+	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	void Initialize(UINT numDescriptors) override;
+	void Initialize(ID3D12Device* device, UINT numDescriptors) override;
 
 	/// <summary>
 	/// CPUディスクリプタハンドルを取得

@@ -1,5 +1,7 @@
 #pragma once
-#include "Engine/Base/GraphicsCore/GraphicsCore.h"
+#include <cassert>
+#include <d3d12.h>
+#include <wrl.h>
 
 class GpuResource {
 public:

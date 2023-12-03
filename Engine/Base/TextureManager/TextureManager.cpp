@@ -1,4 +1,5 @@
 #include "TextureManager.h"
+#include "Engine/Base/GraphicsCore/GraphicsCore.h"
 #include "Engine/Utilities/Log.h"
 #include <cassert>
 
@@ -32,7 +33,7 @@ void TextureManager::Initialize() {
 
 	//ディスクリプタヒープの作成
 	srvDescriptorHeap_ = std::make_unique<SRVHeap>();
-	srvDescriptorHeap_->Initialize(kNumDescriptors);
+	srvDescriptorHeap_->Initialize(device_, kNumDescriptors);
 
 	//デフォルト画像を読み込む
 	LoadInternal("Resources/Images/white.png");
@@ -91,7 +92,7 @@ uint32_t TextureManager::LoadInternal(const std::string& filePath) {
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	//テクスチャ情報を基にリソースを作成
 	textures_[textureHandle_].resource = std::make_unique<TextureResource>();
-	textures_[textureHandle_].resource->Create(metadata);
+	textures_[textureHandle_].resource->Create(device_, metadata);
 	//テクスチャのリソースにデータを転送する
 	textures_[textureHandle_].intermediateResource = UploadTextureData(textures_[textureHandle_].resource.get(), mipImages);
 
@@ -132,7 +133,7 @@ std::unique_ptr<UploadBuffer> TextureManager::UploadTextureData(TextureResource*
 	DirectX::PrepareUpload(device_, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);
 	uint64_t intermediateSize = GetRequiredIntermediateSize(texture->GetResource(), 0, UINT(subresources.size()));
 	std::unique_ptr<UploadBuffer> intermediateResource = std::make_unique<UploadBuffer>();
-	intermediateResource->Create(intermediateSize);
+	intermediateResource->Create(device_, intermediateSize);
 
 	//データ転送をコマンドに積む
 	UpdateSubresources(commandList_, texture->GetResource(), intermediateResource->GetResource(), 0, 0, UINT(subresources.size()), subresources.data());

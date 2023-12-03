@@ -2,8 +2,9 @@
 
 void WorldTransform::Initialize() {
 	//CBVの作成
+	ID3D12Device* device = GraphicsCore::GetInstance()->GetDevice();
 	constBuff_ = std::make_unique<UploadBuffer>();
-	constBuff_->Create(sizeof(ConstBuffDataWorldTransform));
+	constBuff_->Create(device, sizeof(ConstBuffDataWorldTransform));
 }
 
 void WorldTransform::TransferMatrix() {

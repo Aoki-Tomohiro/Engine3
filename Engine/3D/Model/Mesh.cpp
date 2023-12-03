@@ -4,8 +4,9 @@ void Mesh::Initialize(const std::vector<VertexData>& vertices) {
 	//頂点情報を取得
 	vertices_ = vertices;
 	//頂点バッファを作成
+	ID3D12Device* device = GraphicsCore::GetInstance()->GetDevice();
 	vertexBuffer_ = std::make_unique<UploadBuffer>();
-	vertexBuffer_->Create(sizeof(VertexData) * vertices_.size());
+	vertexBuffer_->Create(device, sizeof(VertexData) * vertices_.size());
 
 	//頂点バッファビューを作成
 	vertexBufferView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();//リソースの先頭のアドレスから使う

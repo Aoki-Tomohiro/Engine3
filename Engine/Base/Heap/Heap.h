@@ -1,5 +1,8 @@
 #pragma once
-#include "Engine/Base/GraphicsCore/GraphicsCore.h"
+#include <d3d12.h>
+#include <wrl.h>
+#include <cstdint>
+#include <cassert>
 
 class Heap {
 public:
@@ -11,8 +14,9 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
+	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	virtual void Initialize(UINT numDescriptors) = 0;
+	virtual void Initialize(ID3D12Device* device, UINT numDescriptors) = 0;
 
 	/// <summary>
 	/// CPUディスクリプタハンドルを取得

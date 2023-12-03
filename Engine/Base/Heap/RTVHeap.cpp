@@ -1,8 +1,13 @@
 #include "RTVHeap.h"
 
-void RTVHeap::Initialize(UINT numDescriptors) {
+uint32_t RTVHeap::descriptorSizeRTV = 0;
+
+void RTVHeap::Initialize(ID3D12Device* device, UINT numDescriptors) {
 	//デバイスを取得
-	device_ = GraphicsCore::GetInstance()->GetDevice();
+	device_ = device;
+
+	//インクリメントサイズの初期化
+	descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
 	//ディスクリプタの数を初期化
 	numDescriptors_ = numDescriptors;
@@ -18,13 +23,13 @@ void RTVHeap::Initialize(UINT numDescriptors) {
 
 D3D12_CPU_DESCRIPTOR_HANDLE RTVHeap::GetCPUDescriptorHandle(uint32_t index) {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((GraphicsCore::descriptorSizeRTV * index)).ptr;
+	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((descriptorSizeRTV * index)).ptr;
 	return handleCPU;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE RTVHeap::GetGPUDescriptorHandle(uint32_t index) {
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((GraphicsCore::descriptorSizeRTV * index)).ptr;
+	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((descriptorSizeRTV * index)).ptr;
 	return handleGPU;
 }
 

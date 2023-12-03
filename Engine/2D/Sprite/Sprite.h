@@ -1,8 +1,7 @@
 #pragma once
+#include "Engine/Base/GraphicsCore/GraphicsCore.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 #include "Engine/Math/MathFunction.h"
-#include <array>
-#include <memory>
 
 class Sprite {
 public:
@@ -253,6 +252,8 @@ private:
 	void AdjustTextureSize();
 
 private:
+	//デバイス
+	static ID3D12Device* sDevice_;
 	//コマンドリスト
 	static ID3D12GraphicsCommandList* sCommandList_;
 	//射影行列

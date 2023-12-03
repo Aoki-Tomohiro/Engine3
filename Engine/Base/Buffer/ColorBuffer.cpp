@@ -4,9 +4,9 @@ ColorBuffer::~ColorBuffer() {
 
 }
 
-void ColorBuffer::Create(int32_t width, int32_t height, DXGI_FORMAT format, float* clearColor) {
+void ColorBuffer::Create(ID3D12Device* device, int32_t width, int32_t height, DXGI_FORMAT format, float* clearColor) {
 	//デバイスを取得
-	device_ = GraphicsCore::GetInstance()->GetDevice();
+	device_ = device;
 
 	//クリアカラーの初期化
 	clearColor_[0] = clearColor[0];

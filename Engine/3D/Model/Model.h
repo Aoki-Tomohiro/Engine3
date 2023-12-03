@@ -4,8 +4,6 @@
 #include "Engine/3D/Lights/DirectionalLight.h"
 #include "Engine/3D/Matrix/WorldTransform.h"
 #include "Engine/3D/Camera/Camera.h"
-#include <memory>
-#include <string>
 
 class Model {
 public:

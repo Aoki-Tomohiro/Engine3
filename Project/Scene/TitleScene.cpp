@@ -7,10 +7,13 @@ TitleScene::~TitleScene() {
 void TitleScene::Initialize() {
 	//Rendererのインスタンスを取得
 	renderer_ = Renderer::GetInstance();
+	//カメラの初期化
+	camera_.Initialize();
 }
 
 void TitleScene::Update() {
-
+	//カメラの更新
+	camera_.UpdateMatrix();
 }
 
 void TitleScene::Draw() {

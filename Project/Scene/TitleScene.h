@@ -1,6 +1,10 @@
 #pragma once
 #include "Engine/Framework/Scene/IScene.h"
 #include "Engine/Base/Renderer/Renderer.h"
+#include "Engine/3D/Camera/Camera.h"
+#include "Engine/3D/Model/Model.h"
+#include "Engine/Components/Input/Input.h"
+#include "Engine/Components/Audio/Audio.h"
 
 class TitleScene : public IScene {
 public:
@@ -32,5 +36,7 @@ public:
 private:
 	//Renderer
 	Renderer* renderer_ = nullptr;
+	//カメラ
+	Camera camera_{};
 };
 

@@ -1,8 +1,13 @@
 #include "SRVHeap.h"
 
-void SRVHeap::Initialize(UINT numDescriptors) {
+uint32_t SRVHeap::descriptorSizeSRV = 0;
+
+void SRVHeap::Initialize(ID3D12Device* device, UINT numDescriptors) {
 	//デバイスを取得
-	device_ = GraphicsCore::GetInstance()->GetDevice();
+	device_ = device;
+
+	//インクリメントサイズの初期化
+	descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	//ディスクリプタの数を初期化
 	numDescriptors_ = numDescriptors;
@@ -18,13 +23,13 @@ void SRVHeap::Initialize(UINT numDescriptors) {
 
 D3D12_CPU_DESCRIPTOR_HANDLE SRVHeap::GetCPUDescriptorHandle(uint32_t index) {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((GraphicsCore::descriptorSizeSRV * index)).ptr;
+	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((descriptorSizeSRV * index)).ptr;
 	return handleCPU;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE SRVHeap::GetGPUDescriptorHandle(uint32_t index) {
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((GraphicsCore::descriptorSizeSRV * index)).ptr;
+	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((descriptorSizeSRV * index)).ptr;
 	return handleGPU;
 }
 

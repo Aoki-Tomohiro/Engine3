@@ -1,8 +1,13 @@
 #include "DSVHeap.h"
 
-void DSVHeap::Initialize(UINT numDescriptors) {
+uint32_t DSVHeap::descriptorSizeDSV = 0;
+
+void DSVHeap::Initialize(ID3D12Device* device, UINT numDescriptors) {
 	//デバイスを取得
-	device_ = GraphicsCore::GetInstance()->GetDevice();
+	device_ = device;
+
+	//インクリメントサイズの初期化
+	descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
 	//ディスクリプタの数を初期化
 	numDescriptors_ = numDescriptors;
@@ -18,13 +23,13 @@ void DSVHeap::Initialize(UINT numDescriptors) {
 
 D3D12_CPU_DESCRIPTOR_HANDLE DSVHeap::GetCPUDescriptorHandle(uint32_t index) {
 	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((GraphicsCore::descriptorSizeDSV * index)).ptr;
+	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((descriptorSizeDSV * index)).ptr;
 	return handleCPU;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE DSVHeap::GetGPUDescriptorHandle(uint32_t index) {
 	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((GraphicsCore::descriptorSizeDSV * index)).ptr;
+	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((descriptorSizeDSV * index)).ptr;
 	return handleGPU;
 }
 

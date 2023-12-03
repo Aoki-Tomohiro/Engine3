@@ -4,9 +4,9 @@ DepthBuffer::~DepthBuffer() {
 
 }
 
-void DepthBuffer::Create(int32_t width, int32_t height, DXGI_FORMAT format) {
+void DepthBuffer::Create(ID3D12Device* device, int32_t width, int32_t height, DXGI_FORMAT format) {
 	//デバイスを取得
-	device_ = GraphicsCore::GetInstance()->GetDevice();
+	device_ = device;
 
 	//生成するResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};

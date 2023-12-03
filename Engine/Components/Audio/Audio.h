@@ -96,14 +96,16 @@ public:
 	/// 音声再生
 	/// </summary>
 	/// <param name="audioHandle"></param>
-	/// <param name="roopFlag"></param>
-	void SoundPlayWave(uint32_t audioHandle, bool roopFlag, float volume);
+	/// <param name="loopFlag"></param>
+	/// <param name="volume"></param>
+	/// <returns></returns>
+	uint32_t SoundPlayWave(uint32_t audioHandle, bool loopFlag, float volume);
 
 	/// <summary>
 	/// 音声停止
 	/// </summary>
-	/// <param name="audioHandle"></param>
-	void StopAudio(uint32_t audioHandle);
+	/// <param name="voiceHandle"></param>
+	void StopAudio(uint32_t voiceHandle);
 
 private:
 	Audio() = default;

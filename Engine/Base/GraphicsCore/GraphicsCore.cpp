@@ -1,15 +1,8 @@
 #include "GraphicsCore.h"
-#include "Engine/Base/Heap/RTVHeap.h"
-#include "Engine/Base/Heap/DSVHeap.h"
-#include "Engine/Base/Buffer/ColorBuffer.h"
-#include "Engine/Base/Buffer/DepthBuffer.h"
 #include <cassert>
 
 //実体定義
 GraphicsCore* GraphicsCore::instance = nullptr;
-uint32_t GraphicsCore::descriptorSizeRTV = 0;
-uint32_t GraphicsCore::descriptorSizeDSV = 0;
-uint32_t GraphicsCore::descriptorSizeSRV = 0;
 
 GraphicsCore* GraphicsCore::GetInstance() {
 	if (instance == nullptr) {
@@ -41,9 +34,6 @@ void GraphicsCore::Initialize() {
 
 	//フェンスの作成
 	CreateFence();
-
-	//インクリメントサイズの初期化
-	InitializeDescriptorSizes();
 
 	//ディスクリプタヒープの作成
 	CreateDescriptorHeaps();
@@ -320,21 +310,14 @@ void GraphicsCore::CreateFence() {
 	assert(SUCCEEDED(hr));
 }
 
-void GraphicsCore::InitializeDescriptorSizes() {
-	//インクリメントサイズの初期化
-	descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-}
-
 void GraphicsCore::CreateDescriptorHeaps() {
 	//RTVDescriptorHeapの作成
 	rtvDescriptorHeap_ = std::make_unique<RTVHeap>();
-	rtvDescriptorHeap_->Initialize(2);
+	rtvDescriptorHeap_->Initialize(device_.Get(), 2);
 
 	//DSVDescriptorHeapの作成
 	dsvDescriptorHeap_ = std::make_unique<DSVHeap>();
-	dsvDescriptorHeap_->Initialize(1);
+	dsvDescriptorHeap_->Initialize(device_.Get(), 1);
 }
 
 void GraphicsCore::CreateSwapChainResources() {
@@ -359,7 +342,7 @@ void GraphicsCore::CreateRenderTargetViews() {
 void GraphicsCore::CreateDepthBufferAndView() {
 	// DepthBufferの作成
 	depthStencilResource_ = std::make_unique<DepthBuffer>();
-	depthStencilResource_->Create(app_->kClientWidth, app_->kClientHeight, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	depthStencilResource_->Create(device_.Get(), app_->kClientWidth, app_->kClientHeight, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
 	// DepthStencilViewの作成
 	uint32_t dsvIndex = dsvDescriptorHeap_->CreateDepthStencilView(depthStencilResource_->GetResource(), DXGI_FORMAT_D24_UNORM_S8_UINT);
