@@ -202,6 +202,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Utilities\Log.cpp" />
     <ClCompile Include="Engine\Utilities\RandomGenerator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Project\GameObject\InputHandler.cpp" />
+    <ClCompile Include="Project\GameObject\MoveLeftCommand.cpp" />
+    <ClCompile Include="Project\GameObject\MoveRightCommand.cpp" />
+    <ClCompile Include="Project\GameObject\Player.cpp" />
     <ClCompile Include="Project\Game\GameManager.cpp" />
     <ClCompile Include="Project\Scene\GameScene.cpp" />
     <ClCompile Include="Project\Scene\SceneFactory.cpp" />
@@ -263,6 +267,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Utilities\GlobalVariables.h" />
     <ClInclude Include="Engine\Utilities\Log.h" />
     <ClInclude Include="Engine\Utilities\RandomGenerator.h" />
+    <ClInclude Include="Project\GameObject\ICommand.h" />
+    <ClInclude Include="Project\GameObject\InputHandler.h" />
+    <ClInclude Include="Project\GameObject\MoveLeftCommand.h" />
+    <ClInclude Include="Project\GameObject\MoveRightCommand.h" />
+    <ClInclude Include="Project\GameObject\Player.h" />
     <ClInclude Include="Project\Game\GameManager.h" />
     <ClInclude Include="Project\Scene\GameScene.h" />
     <ClInclude Include="Project\Scene\SceneFactory.h" />

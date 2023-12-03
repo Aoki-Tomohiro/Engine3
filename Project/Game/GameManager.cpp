@@ -6,7 +6,7 @@ void GameManager::Initialize() {
 	//シーンの生成
 	sceneFactory_ = std::make_unique<SceneFactory>();
 	sceneManager_->SetSceneFactory(sceneFactory_.get());
-	sceneManager_->ChangeScene("TitleScene");
+	sceneManager_->ChangeScene("GameScene");
 }
 
 void GameManager::Update() {
