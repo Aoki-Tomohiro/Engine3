@@ -1,8 +1,8 @@
 #include "GraphicsCore.h"
-#include "Engine/Base/Heaps/RTVHeap.h"
-#include "Engine/Base/Heaps/DSVHeap.h"
-#include "Engine/Base/Buffers/ColorBuffer.h"
-#include "Engine/Base/Buffers/DepthBuffer.h"
+#include "Engine/Base/Heap/RTVHeap.h"
+#include "Engine/Base/Heap/DSVHeap.h"
+#include "Engine/Base/Buffer/ColorBuffer.h"
+#include "Engine/Base/Buffer/DepthBuffer.h"
 #include <cassert>
 
 //実体定義
