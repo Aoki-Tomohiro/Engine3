@@ -14,13 +14,13 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"winmm.lib")
 
-class GraphicsCore {
+class GraphicsCommon {
 public:
 	/// <summary>
 	/// シングルトンインスタンスの取得
 	/// </summary>
 	/// <returns></returns>
-	static GraphicsCore* GetInstance();
+	static GraphicsCommon* GetInstance();
 
 	/// <summary>
 	/// シングルトンインスタンスの削除
@@ -72,10 +72,10 @@ public:
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList_.Get(); };
 
 private:
-	GraphicsCore() = default;
-	~GraphicsCore() = default;
-	GraphicsCore(const GraphicsCore&) = delete;
-	GraphicsCore& operator=(const GraphicsCore&) = delete;
+	GraphicsCommon() = default;
+	~GraphicsCommon() = default;
+	GraphicsCommon(const GraphicsCommon&) = delete;
+	GraphicsCommon& operator=(const GraphicsCommon&) = delete;
 
 	/// <summary>
 	/// DXGIデバイスの作成
@@ -129,7 +129,7 @@ private:
 
 private:
 	//インスタンス
-	static GraphicsCore* instance;
+	static GraphicsCommon* instance;
 	//ウィンドウズアプリケーション
 	Application* app_ = nullptr;
 	//DXGIファクトリー

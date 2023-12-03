@@ -4,7 +4,7 @@ void Mesh::Initialize(const std::vector<VertexData>& vertices) {
 	//頂点情報を取得
 	vertices_ = vertices;
 	//頂点バッファを作成
-	ID3D12Device* device = GraphicsCore::GetInstance()->GetDevice();
+	ID3D12Device* device = GraphicsCommon::GetInstance()->GetDevice();
 	vertexBuffer_ = std::make_unique<UploadBuffer>();
 	vertexBuffer_->Create(device, sizeof(VertexData) * vertices_.size());
 
@@ -21,7 +21,7 @@ void Mesh::Initialize(const std::vector<VertexData>& vertices) {
 
 void Mesh::SetGraphicsCommand() {
 	//コマンドリストを取得
-	ID3D12GraphicsCommandList* commandList = GraphicsCore::GetInstance()->GetCommandList();
+	ID3D12GraphicsCommandList* commandList = GraphicsCommon::GetInstance()->GetCommandList();
 	//VBVを設定
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//形状を設定。PSOに設定しているものとは別。同じものを設定すると考えておけば良い
@@ -30,7 +30,7 @@ void Mesh::SetGraphicsCommand() {
 
 void Mesh::Draw() {
 	//コマンドリストを取得
-	ID3D12GraphicsCommandList* commandList = GraphicsCore::GetInstance()->GetCommandList();
+	ID3D12GraphicsCommandList* commandList = GraphicsCommon::GetInstance()->GetCommandList();
 	//描画!(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
 	commandList->DrawInstanced(UINT(vertices_.size()), 1, 0, 0);
 }

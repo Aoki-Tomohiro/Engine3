@@ -7,9 +7,9 @@ Matrix4x4 Sprite::sMatProjection_{};
 
 void Sprite::StaticInitialize() {
 	//デバイスの取得
-	sDevice_ = GraphicsCore::GetInstance()->GetDevice();
+	sDevice_ = GraphicsCommon::GetInstance()->GetDevice();
 	//コマンドリストの取得
-	sCommandList_ = GraphicsCore::GetInstance()->GetCommandList();
+	sCommandList_ = GraphicsCommon::GetInstance()->GetCommandList();
 	//平行投影行列の作成
 	sMatProjection_ = MakeOrthographicMatrix(0.0f, 0.0f, 1280.0f, 720.0f, 0.0f, 100.0f);
 }

@@ -1,22 +1,22 @@
-#include "GraphicsCore.h"
+#include "GraphicsCommon.h"
 #include <cassert>
 
 //実体定義
-GraphicsCore* GraphicsCore::instance = nullptr;
+GraphicsCommon* GraphicsCommon::instance = nullptr;
 
-GraphicsCore* GraphicsCore::GetInstance() {
+GraphicsCommon* GraphicsCommon::GetInstance() {
 	if (instance == nullptr) {
-		instance = new GraphicsCore();
+		instance = new GraphicsCommon();
 	}
 	return instance;
 }
 
-void GraphicsCore::DeleteInstance() {
+void GraphicsCommon::DeleteInstance() {
 	delete instance;
 	instance = nullptr;
 }
 
-void GraphicsCore::Initialize() {
+void GraphicsCommon::Initialize() {
 	//WindowsApplicationのインスタンスを取得
 	app_ = Application::GetInstance();
 
@@ -48,7 +48,7 @@ void GraphicsCore::Initialize() {
 	CreateDepthBufferAndView();
 }
 
-void GraphicsCore::PreDraw() {
+void GraphicsCommon::PreDraw() {
 	//これから書き込むバックバッファのインデックスを取得
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
@@ -92,7 +92,7 @@ void GraphicsCore::PreDraw() {
 	commandList_->RSSetScissorRects(1, &scissorRect);
 }
 
-void GraphicsCore::PostDraw() {
+void GraphicsCommon::PostDraw() {
 	//バックバッファのインデックスを取得
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
@@ -136,7 +136,7 @@ void GraphicsCore::PostDraw() {
 	assert(SUCCEEDED(hr));
 }
 
-void GraphicsCore::ClearRenderTarget() {
+void GraphicsCommon::ClearRenderTarget() {
 	//バックバッファのインデックスを取得
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 	//ディスクリプタハンドルを取得
@@ -148,12 +148,12 @@ void GraphicsCore::ClearRenderTarget() {
 	commandList_->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 }
 
-void GraphicsCore::ClearDepthBuffer() {
+void GraphicsCommon::ClearDepthBuffer() {
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandle(0);
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
-void GraphicsCore::TransitionResource(GpuResource& resource, D3D12_RESOURCE_STATES newState) {
+void GraphicsCommon::TransitionResource(GpuResource& resource, D3D12_RESOURCE_STATES newState) {
 	//現在のリソースの状態を取得
 	D3D12_RESOURCE_STATES currentState = resource.GetResourceState();
 
@@ -180,7 +180,7 @@ void GraphicsCore::TransitionResource(GpuResource& resource, D3D12_RESOURCE_STAT
 	}
 }
 
-void GraphicsCore::CreateDevice() {
+void GraphicsCommon::CreateDevice() {
 #ifdef _DEBUG
 	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
@@ -269,7 +269,7 @@ void GraphicsCore::CreateDevice() {
 #endif
 }
 
-void GraphicsCore::CreateCommand() {
+void GraphicsCommon::CreateCommand() {
 	//コマンドキューを作成する
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc{};
 	HRESULT hr = device_->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&commandQueue_));
@@ -289,7 +289,7 @@ void GraphicsCore::CreateCommand() {
 	assert(SUCCEEDED(hr));
 }
 
-void GraphicsCore::CreateSwapChain() {
+void GraphicsCommon::CreateSwapChain() {
 	//スワップチェーンを作成する
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
 	swapChainDesc.Width = app_->kClientWidth;//画面の幅。ウィンドウのクライアント領域と同じものにしておく
@@ -304,13 +304,13 @@ void GraphicsCore::CreateSwapChain() {
 	assert(SUCCEEDED(hr));
 }
 
-void GraphicsCore::CreateFence() {
+void GraphicsCommon::CreateFence() {
 	//初期値0でFenceを作る
 	HRESULT hr = device_->CreateFence(fenceValue_, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence_));
 	assert(SUCCEEDED(hr));
 }
 
-void GraphicsCore::CreateDescriptorHeaps() {
+void GraphicsCommon::CreateDescriptorHeaps() {
 	//RTVDescriptorHeapの作成
 	rtvDescriptorHeap_ = std::make_unique<RTVHeap>();
 	rtvDescriptorHeap_->Initialize(device_.Get(), 2);
@@ -320,7 +320,7 @@ void GraphicsCore::CreateDescriptorHeaps() {
 	dsvDescriptorHeap_->Initialize(device_.Get(), 1);
 }
 
-void GraphicsCore::CreateSwapChainResources() {
+void GraphicsCommon::CreateSwapChainResources() {
 	// クリアカラー
 	float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };  // 青っぽい色。RGBAの順
 
@@ -331,7 +331,7 @@ void GraphicsCore::CreateSwapChainResources() {
 	}
 }
 
-void GraphicsCore::CreateRenderTargetViews() {
+void GraphicsCommon::CreateRenderTargetViews() {
 	// レンダーターゲットビューの作成
 	for (uint32_t i = 0; i < 2; i++) {
 		uint32_t rtvIndex = rtvDescriptorHeap_->CreateRenderTargetView(swapChainResource_[i]->GetResource(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
@@ -339,7 +339,7 @@ void GraphicsCore::CreateRenderTargetViews() {
 	}
 }
 
-void GraphicsCore::CreateDepthBufferAndView() {
+void GraphicsCommon::CreateDepthBufferAndView() {
 	// DepthBufferの作成
 	depthStencilResource_ = std::make_unique<DepthBuffer>();
 	depthStencilResource_->Create(device_.Get(), app_->kClientWidth, app_->kClientHeight, DXGI_FORMAT_D24_UNORM_S8_UINT);
@@ -349,12 +349,12 @@ void GraphicsCore::CreateDepthBufferAndView() {
 	depthStencilResource_->SetDSVHandle(dsvDescriptorHeap_->GetCPUDescriptorHandle(dsvIndex));
 }
 
-void GraphicsCore::InitializeFixFPS() {
+void GraphicsCommon::InitializeFixFPS() {
 	//現在時間を記録する
 	reference_ = std::chrono::steady_clock::now();
 }
 
-void GraphicsCore::UpdateFixFPS() {
+void GraphicsCommon::UpdateFixFPS() {
 	//1/60秒ぴったりの時間
 	const std::chrono::microseconds kMinTime(uint64_t(1000000.0f / 60.0f));
 	//1/60秒よりわずかに短い時間

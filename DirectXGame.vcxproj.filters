@@ -112,12 +112,6 @@
     <Filter Include="ソース ファイル\Engine\Components\Input">
       <UniqueIdentifier>{f7eef415-51ea-45bb-9fc9-5d4571e88892}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Engine\Base\GraphicsCore">
-      <UniqueIdentifier>{23a606ad-629b-4eb5-a1be-25adc7233f86}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Engine\Base\GraphicsCore">
-      <UniqueIdentifier>{33161d57-e932-4c05-bb37-4b4c71bc6ce8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ヘッダー ファイル\Engine\Base\ImGuiManager">
       <UniqueIdentifier>{33215b35-fec5-4601-bdac-592dbef1f2e3}</UniqueIdentifier>
     </Filter>
@@ -201,6 +195,12 @@
     </Filter>
     <Filter Include="ソース ファイル\Engine\Base\Buffer">
       <UniqueIdentifier>{adcb103e-c807-4a42-8fc2-f0973cb729c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Base\GraphicsCommon">
+      <UniqueIdentifier>{33161d57-e932-4c05-bb37-4b4c71bc6ce8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Base\GraphicsCommon">
+      <UniqueIdentifier>{23a606ad-629b-4eb5-a1be-25adc7233f86}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -315,9 +315,6 @@
     <ClCompile Include="Engine\Externals\imgui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Base\GraphicsCore\GraphicsCore.cpp">
-      <Filter>ソース ファイル\Engine\Base\GraphicsCore</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Base\Heap\SRVHeap.cpp">
       <Filter>ソース ファイル\Engine\Base\Heap</Filter>
     </ClCompile>
@@ -338,6 +335,9 @@
     </ClCompile>
     <ClCompile Include="Engine\Base\Buffer\ColorBuffer.cpp">
       <Filter>ソース ファイル\Engine\Base\Buffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\GraphicsCommon\GraphicsCommon.cpp">
+      <Filter>ソース ファイル\Engine\Base\GraphicsCommon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -488,9 +488,6 @@
     <ClInclude Include="Engine\Externals\imgui\imstb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Base\GraphicsCore\GraphicsCore.h">
-      <Filter>ヘッダー ファイル\Engine\Base\GraphicsCore</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Base\Heap\DSVHeap.h">
       <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
     </ClInclude>
@@ -517,6 +514,9 @@
     </ClInclude>
     <ClInclude Include="Engine\Base\Buffer\UploadBuffer.h">
       <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\GraphicsCommon\GraphicsCommon.h">
+      <Filter>ヘッダー ファイル\Engine\Base\GraphicsCommon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Base/GraphicsCore/GraphicsCore.h"
+#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
 #include "Engine/Base/Buffer/UploadBuffer.h"
 #include "Engine/Math/MathFunction.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Base/GraphicsCore/GraphicsCore.h"
+#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
 #include "Engine/Base/Heap/SRVHeap.h"
 #include "Engine/Externals/imgui/imgui.h"
 #include "Engine/Externals/imgui/imgui_impl_dx12.h"
@@ -48,7 +48,7 @@ private:
 	//ウィンドウズアプリケーション
 	Application* app_ = nullptr;
 	//DirectXCommon
-	GraphicsCore* core_ = nullptr;
+	GraphicsCommon* core_ = nullptr;
 	//SRV用ヒープ
 	std::unique_ptr<SRVHeap> srvDescriptorHeap_ = nullptr;
 };

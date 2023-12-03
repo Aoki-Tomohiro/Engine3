@@ -17,9 +17,9 @@ void Renderer::DeleteInstance() {
 
 void Renderer::Initialize() {
 	//デバイスの取得
-	device_ = GraphicsCore::GetInstance()->GetDevice();
+	device_ = GraphicsCommon::GetInstance()->GetDevice();
 	//コマンドリストの取得
-	commandList_ = GraphicsCore::GetInstance()->GetCommandList();
+	commandList_ = GraphicsCommon::GetInstance()->GetCommandList();
 
 	//DXCの初期化
 	InitializeDXC();

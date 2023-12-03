@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Base/Windows/Application.h"
-#include "Engine/Base/GraphicsCore/GraphicsCore.h"
+#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 #include "Engine/Base/ImGuiManager/ImGuiManager.h"
 #include "Engine/Base/Renderer/Renderer.h"
@@ -49,8 +49,8 @@ protected:
 	D3DResourceLeakChecker leakChecker_{};
 	//WindowsApplication
 	Application* app_ = nullptr;
-	//GraphicsCore
-	GraphicsCore* core_ = nullptr;
+	//GraphicsCommon
+	GraphicsCommon* core_ = nullptr;
 	//テクスチャマネージャー
 	TextureManager* textureManager_ = nullptr;
 	//ImGuiManager

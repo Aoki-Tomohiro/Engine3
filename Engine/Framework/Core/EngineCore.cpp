@@ -21,7 +21,7 @@ EngineCore::~EngineCore() {
 	TextureManager::DeleteInstnace();
 
 	//GraphicsCoreの解放
-	GraphicsCore::DeleteInstance();
+	GraphicsCommon::DeleteInstance();
 
 	//ゲームウィンドウを閉じる
 	app_->CloseGameWindow();
@@ -33,7 +33,7 @@ void EngineCore::Initialize() {
 	app_->CreateGameWindow(L"DirectXGame", Application::kClientWidth, Application::kClientHeight);
 
 	//GraphicsCoreの初期化
-	core_ = GraphicsCore::GetInstance();
+	core_ = GraphicsCommon::GetInstance();
 	core_->Initialize();
 
 	//テクスチャマネージャーの初期化

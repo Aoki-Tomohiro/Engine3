@@ -10,7 +10,7 @@ std::vector<Model::ModelData> Model::sModelDatas_{};
 
 void Model::StaticInitialize() {
 	//コマンドリストを取得
-	sCommandList_ = GraphicsCore::GetInstance()->GetCommandList();
+	sCommandList_ = GraphicsCommon::GetInstance()->GetCommandList();
 }
 
 Model* Model::CreateFromOBJ(const std::string& directoryPath, const std::string& filename) {

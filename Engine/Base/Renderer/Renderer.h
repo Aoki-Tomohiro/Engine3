@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 #include <vector>
 #include <dxcapi.h>

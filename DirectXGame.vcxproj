@@ -159,7 +159,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Base\Buffer\DepthBuffer.cpp" />
     <ClCompile Include="Engine\Base\Buffer\TextureResource.cpp" />
     <ClCompile Include="Engine\Base\Buffer\UploadBuffer.cpp" />
-    <ClCompile Include="Engine\Base\GraphicsCore\GraphicsCore.cpp" />
+    <ClCompile Include="Engine\Base\GraphicsCommon\GraphicsCommon.cpp" />
     <ClCompile Include="Engine\Base\Heap\DSVHeap.cpp" />
     <ClCompile Include="Engine\Base\Heap\RTVHeap.cpp" />
     <ClCompile Include="Engine\Base\Heap\SRVHeap.cpp" />
@@ -221,7 +221,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Base\Buffer\GpuResource.h" />
     <ClInclude Include="Engine\Base\Buffer\TextureResource.h" />
     <ClInclude Include="Engine\Base\Buffer\UploadBuffer.h" />
-    <ClInclude Include="Engine\Base\GraphicsCore\GraphicsCore.h" />
+    <ClInclude Include="Engine\Base\GraphicsCommon\GraphicsCommon.h" />
     <ClInclude Include="Engine\Base\Heap\DSVHeap.h" />
     <ClInclude Include="Engine\Base\Heap\Heap.h" />
     <ClInclude Include="Engine\Base\Heap\RTVHeap.h" />

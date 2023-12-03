@@ -9,7 +9,7 @@ void ImGuiManager::Initialize() {
 	//ウィンドウズアプリケーションのインスタンスを取得
 	app_ = Application::GetInstance();
 	//DirectXCommonのインスタンスを取得
-	core_ = GraphicsCore::GetInstance();
+	core_ = GraphicsCommon::GetInstance();
 
 	//SRVDescriptorHeapの作成
 	srvDescriptorHeap_ = std::make_unique<SRVHeap>();

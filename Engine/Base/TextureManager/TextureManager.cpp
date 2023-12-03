@@ -27,9 +27,9 @@ uint32_t TextureManager::Load(const std::string& filePath) {
 
 void TextureManager::Initialize() {
 	//デバイスの取得
-	device_ = GraphicsCore::GetInstance()->GetDevice();
+	device_ = GraphicsCommon::GetInstance()->GetDevice();
 	//コマンドリストの取得
-	commandList_ = GraphicsCore::GetInstance()->GetCommandList();
+	commandList_ = GraphicsCommon::GetInstance()->GetCommandList();
 
 	//ディスクリプタヒープの作成
 	srvDescriptorHeap_ = std::make_unique<SRVHeap>();
@@ -139,7 +139,7 @@ std::unique_ptr<UploadBuffer> TextureManager::UploadTextureData(TextureResource*
 	UpdateSubresources(commandList_, texture->GetResource(), intermediateResource->GetResource(), 0, 0, UINT(subresources.size()), subresources.data());
 
 	//Textureへの転送後は利用できるよう、D3D12_RESOURCE_STATE_COPY_DESTからD3D12_RESOURCE_STATE_GENERIC_READへResourceStateを変更する
-	GraphicsCore::GetInstance()->TransitionResource(*texture, D3D12_RESOURCE_STATE_GENERIC_READ);
+	GraphicsCommon::GetInstance()->TransitionResource(*texture, D3D12_RESOURCE_STATE_GENERIC_READ);
 
 	return intermediateResource;
 }

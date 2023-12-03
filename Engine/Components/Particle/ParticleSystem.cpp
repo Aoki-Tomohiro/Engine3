@@ -1,5 +1,5 @@
 #include "ParticleSystem.h"
-#include "Engine/Base/GraphicsCore/GraphicsCore.h"
+#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 
 //実体定義
@@ -9,8 +9,8 @@ ID3D12GraphicsCommandList* ParticleSystem::sCommandList_ = nullptr;
 
 void ParticleSystem::StaticInitialize() {
 	//コマンドリストの取得
-	sCommandList_ = GraphicsCore::GetInstance()->GetCommandList();
-	sDevice_ = GraphicsCore::GetInstance()->GetDevice();
+	sCommandList_ = GraphicsCommon::GetInstance()->GetCommandList();
+	sDevice_ = GraphicsCommon::GetInstance()->GetDevice();
 }
 
 void ParticleSystem::Initialize() {
