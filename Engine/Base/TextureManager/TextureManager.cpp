@@ -1,5 +1,5 @@
 #include "TextureManager.h"
-#include "Engine/Base/GraphicsCore/GraphicsCore.h"
+#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
 #include "Engine/Utilities/Log.h"
 #include <cassert>
 
