@@ -202,6 +202,12 @@
     <Filter Include="ソース ファイル\Engine\Base\GraphicsCommon">
       <UniqueIdentifier>{23a606ad-629b-4eb5-a1be-25adc7233f86}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Engine\Components\PostEffects">
+      <UniqueIdentifier>{9e1b93bb-986e-4766-b07f-575e983d0208}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Components\PostEffects">
+      <UniqueIdentifier>{e15f537e-739d-4cb5-a568-701d7b0bc7f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -315,14 +321,20 @@
     <ClCompile Include="Engine\Externals\imgui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Base\Heap\SRVHeap.cpp">
+    <ClCompile Include="Engine\Base\GraphicsCommon\GraphicsCommon.cpp">
+      <Filter>ソース ファイル\Engine\Base\GraphicsCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\PostEffects\PostEffects.cpp">
+      <Filter>ソース ファイル\Engine\Components\PostEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\PostEffects\GaussianBlur.cpp">
+      <Filter>ソース ファイル\Engine\Components\PostEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Heap\Heap.cpp">
       <Filter>ソース ファイル\Engine\Base\Heap</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Base\Heap\RTVHeap.cpp">
-      <Filter>ソース ファイル\Engine\Base\Heap</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Base\Heap\DSVHeap.cpp">
-      <Filter>ソース ファイル\Engine\Base\Heap</Filter>
+    <ClCompile Include="Engine\Base\Buffer\GpuResource.cpp">
+      <Filter>ソース ファイル\Engine\Base\Buffer</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Base\Buffer\UploadBuffer.cpp">
       <Filter>ソース ファイル\Engine\Base\Buffer</Filter>
@@ -336,8 +348,14 @@
     <ClCompile Include="Engine\Base\Buffer\ColorBuffer.cpp">
       <Filter>ソース ファイル\Engine\Base\Buffer</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Base\GraphicsCommon\GraphicsCommon.cpp">
-      <Filter>ソース ファイル\Engine\Base\GraphicsCommon</Filter>
+    <ClCompile Include="Engine\Base\Heap\RTVHeap.cpp">
+      <Filter>ソース ファイル\Engine\Base\Heap</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Heap\SRVHeap.cpp">
+      <Filter>ソース ファイル\Engine\Base\Heap</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\Heap\DSVHeap.cpp">
+      <Filter>ソース ファイル\Engine\Base\Heap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -488,11 +506,32 @@
     <ClInclude Include="Engine\Externals\imgui\imstb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Base\Heap\DSVHeap.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
+    <ClInclude Include="Engine\Base\GraphicsCommon\GraphicsCommon.h">
+      <Filter>ヘッダー ファイル\Engine\Base\GraphicsCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\PostEffects\PostEffects.h">
+      <Filter>ヘッダー ファイル\Engine\Components\PostEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\PostEffects\GaussianBlur.h">
+      <Filter>ヘッダー ファイル\Engine\Components\PostEffects</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Base\Heap\Heap.h">
       <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\GpuResource.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\UploadBuffer.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\TextureResource.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\DepthBuffer.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\Buffer\ColorBuffer.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Base\Heap\RTVHeap.h">
       <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
@@ -500,23 +539,8 @@
     <ClInclude Include="Engine\Base\Heap\SRVHeap.h">
       <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Base\Buffer\ColorBuffer.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Buffer\DepthBuffer.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Buffer\GpuResource.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Buffer\TextureResource.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Buffer\UploadBuffer.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Buffer</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\GraphicsCommon\GraphicsCommon.h">
-      <Filter>ヘッダー ファイル\Engine\Base\GraphicsCommon</Filter>
+    <ClInclude Include="Engine\Base\Heap\DSVHeap.h">
+      <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -537,7 +561,7 @@
     <None Include="Resources\Shader\Particle.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Resources\Shader\PostProcess.hlsli">
+    <None Include="Resources\Shader\PostEffects.hlsli">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Resources\Shader\Sprite.hlsli">
@@ -572,10 +596,10 @@
     <FxCompile Include="Resources\Shader\Particle.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\PostProcessPS.hlsl">
+    <FxCompile Include="Resources\Shader\PostEffectsPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\PostProcessVS.hlsl">
+    <FxCompile Include="Resources\Shader\PostEffectsVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shader\SpritePS.hlsl">

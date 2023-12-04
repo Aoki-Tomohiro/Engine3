@@ -157,10 +157,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\3D\Model\Model.cpp" />
     <ClCompile Include="Engine\Base\Buffer\ColorBuffer.cpp" />
     <ClCompile Include="Engine\Base\Buffer\DepthBuffer.cpp" />
+    <ClCompile Include="Engine\Base\Buffer\GpuResource.cpp" />
     <ClCompile Include="Engine\Base\Buffer\TextureResource.cpp" />
     <ClCompile Include="Engine\Base\Buffer\UploadBuffer.cpp" />
     <ClCompile Include="Engine\Base\GraphicsCommon\GraphicsCommon.cpp" />
     <ClCompile Include="Engine\Base\Heap\DSVHeap.cpp" />
+    <ClCompile Include="Engine\Base\Heap\Heap.cpp" />
     <ClCompile Include="Engine\Base\Heap\RTVHeap.cpp" />
     <ClCompile Include="Engine\Base\Heap\SRVHeap.cpp" />
     <ClCompile Include="Engine\Base\ImGuiManager\ImGuiManager.cpp" />
@@ -174,6 +176,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Components\Particle\Particle.cpp" />
     <ClCompile Include="Engine\Components\Particle\ParticleEmitter.cpp" />
     <ClCompile Include="Engine\Components\Particle\ParticleSystem.cpp" />
+    <ClCompile Include="Engine\Components\PostEffects\GaussianBlur.cpp" />
+    <ClCompile Include="Engine\Components\PostEffects\PostEffects.cpp" />
     <ClCompile Include="Engine\Externals\imgui\imgui.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MinSpace</Optimization>
     </ClCompile>
@@ -239,6 +243,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Components\Particle\Particle.h" />
     <ClInclude Include="Engine\Components\Particle\ParticleEmitter.h" />
     <ClInclude Include="Engine\Components\Particle\ParticleSystem.h" />
+    <ClInclude Include="Engine\Components\PostEffects\GaussianBlur.h" />
+    <ClInclude Include="Engine\Components\PostEffects\PostEffects.h" />
     <ClInclude Include="Engine\Externals\imgui\imconfig.h" />
     <ClInclude Include="Engine\Externals\imgui\imgui.h" />
     <ClInclude Include="Engine\Externals\imgui\imgui_impl_dx12.h" />
@@ -288,7 +294,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="Resources\Shader\PostProcess.hlsli">
+    <None Include="Resources\Shader\PostEffects.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
@@ -334,11 +340,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\PostProcessPS.hlsl">
+    <FxCompile Include="Resources\Shader\PostEffectsPS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\PostProcessVS.hlsl">
+    <FxCompile Include="Resources\Shader\PostEffectsVS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>

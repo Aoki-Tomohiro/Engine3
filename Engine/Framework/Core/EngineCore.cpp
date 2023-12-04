@@ -88,10 +88,16 @@ void EngineCore::Update() {
 
 void EngineCore::Draw() {
 	//描画前処理
-	core_->PreDraw();
+	renderer_->PreDraw();
 
 	//シーンの描画
 	sceneManager_->Draw();
+
+	//描画後処理
+	renderer_->PostDraw();
+
+	//描画前処理
+	core_->PreDraw();
 
 	//スプライトの描画
 	sceneManager_->DrawUI();

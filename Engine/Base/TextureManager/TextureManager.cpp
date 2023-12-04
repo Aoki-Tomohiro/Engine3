@@ -33,7 +33,7 @@ void TextureManager::Initialize() {
 
 	//ディスクリプタヒープの作成
 	srvDescriptorHeap_ = std::make_unique<SRVHeap>();
-	srvDescriptorHeap_->Initialize(device_, kNumDescriptors);
+	srvDescriptorHeap_->Create(device_, kNumDescriptors);
 
 	//デフォルト画像を読み込む
 	LoadInternal("Resources/Images/white.png");
@@ -47,7 +47,7 @@ void TextureManager::SetGraphicsDescriptorHeap() {
 
 void TextureManager::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uint32_t textureHandle) {
 	//SRVのDescriptorTableの先頭を設定
-	commandList_->SetGraphicsRootDescriptorTable(rootParameterIndex, textures_[textureHandle].resource->GetGpuHandle());
+	commandList_->SetGraphicsRootDescriptorTable(rootParameterIndex, textures_[textureHandle].resource->GetSRVGpuHandle());
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::CreateInstancingShaderResourceView(UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size) {
@@ -57,7 +57,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::CreateInstancingShaderResourceView(U
 	if (textureHandle_ >= kNumDescriptors) {
 		assert(0);
 	}
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGpu = srvDescriptorHeap_->CreateInstancingShaderResourceView(instancingResource.GetResource(), kNumInstance, size);
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGpu = srvDescriptorHeap_->CreateInstancingShaderResourceView(instancingResource, kNumInstance, size);
 	textures_[textureHandle_].name = "instancingResource";
 	return srvHandleGpu;
 }
@@ -96,12 +96,8 @@ uint32_t TextureManager::LoadInternal(const std::string& filePath) {
 	//テクスチャのリソースにデータを転送する
 	textures_[textureHandle_].intermediateResource = UploadTextureData(textures_[textureHandle_].resource.get(), mipImages);
 
-	//SRVを作成するDescriptorHeapの場所を決める
-	textures_[textureHandle_].resource->SetCpuHandle(srvDescriptorHeap_->GetCPUDescriptorHandle(textureHandle_));
-	textures_[textureHandle_].resource->SetGpuHandle(srvDescriptorHeap_->GetGPUDescriptorHandle(textureHandle_));
-
 	//SRVの作成
-	srvDescriptorHeap_->CreateShaderResourceView(textures_[textureHandle_].resource->GetResource(), metadata.format, UINT(metadata.mipLevels));
+	srvDescriptorHeap_->CreateShaderResourceView(*textures_[textureHandle_].resource, metadata.format, UINT(metadata.mipLevels));
 
 	//テクスチャの名前を保存する
 	textures_[textureHandle_].name = filePath;

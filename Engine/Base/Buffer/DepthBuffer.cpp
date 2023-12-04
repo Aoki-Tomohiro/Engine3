@@ -1,12 +1,11 @@
 #include "DepthBuffer.h"
 
-DepthBuffer::~DepthBuffer() {
-
-}
-
 void DepthBuffer::Create(ID3D12Device* device, int32_t width, int32_t height, DXGI_FORMAT format) {
 	//デバイスを取得
 	device_ = device;
+
+	//リソースの状態
+	resourceState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 
 	//生成するResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
@@ -27,9 +26,6 @@ void DepthBuffer::Create(ID3D12Device* device, int32_t width, int32_t height, DX
 	D3D12_CLEAR_VALUE depthClearValue{};
 	depthClearValue.DepthStencil.Depth = 1.0f;//1.0f(最大値)でクリア
 	depthClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;//フォーマット。Resourceと合わせる
-
-	//リソースの状態
-	resourceState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;
 
 	//Resourceの作成
 	HRESULT hr = device_->CreateCommittedResource(

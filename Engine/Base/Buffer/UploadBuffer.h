@@ -6,7 +6,7 @@ public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~UploadBuffer() override;
+	~UploadBuffer() override = default;
 
 	/// <summary>
 	/// 作成

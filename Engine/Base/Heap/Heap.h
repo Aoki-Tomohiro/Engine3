@@ -12,12 +12,19 @@ public:
 	~Heap() = default;
 
 	/// <summary>
-	/// 初期化
+	/// 作成
 	/// </summary>
 	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	virtual void Initialize(ID3D12Device* device, UINT numDescriptors) = 0;
+	virtual void Create(ID3D12Device* device, UINT numDescriptors) = 0;
 
+	/// <summary>
+	/// ディスクリプタヒープを取得
+	/// </summary>
+	/// <returns></returns>
+	ID3D12DescriptorHeap* GetDescriptorHeap() const { return descriptorHeap_.Get(); };
+
+private:
 	/// <summary>
 	/// CPUディスクリプタハンドルを取得
 	/// </summary>
@@ -36,11 +43,6 @@ public:
 	/// <returns></returns>
 	virtual D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index) = 0;
 
-	/// <summary>
-	/// ディスクリプタヒープを取得
-	/// </summary>
-	/// <returns></returns>
-	ID3D12DescriptorHeap* GetDescriptorHeap() const { return descriptorHeap_.Get(); };
 
 protected:
 	//デバイス

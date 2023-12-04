@@ -1,9 +1,5 @@
 #include "ColorBuffer.h"
 
-ColorBuffer::~ColorBuffer() {
-
-}
-
 void ColorBuffer::Create(ID3D12Device* device, int32_t width, int32_t height, DXGI_FORMAT format, float* clearColor) {
 	//デバイスを取得
 	device_ = device;

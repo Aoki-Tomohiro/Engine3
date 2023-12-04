@@ -2,7 +2,7 @@
 
 uint32_t RTVHeap::descriptorSizeRTV = 0;
 
-void RTVHeap::Initialize(ID3D12Device* device, UINT numDescriptors) {
+void RTVHeap::Create(ID3D12Device* device, UINT numDescriptors) {
 	//デバイスを取得
 	device_ = device;
 
@@ -21,19 +21,7 @@ void RTVHeap::Initialize(ID3D12Device* device, UINT numDescriptors) {
 	assert(SUCCEEDED(hr));
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE RTVHeap::GetCPUDescriptorHandle(uint32_t index) {
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((descriptorSizeRTV * index)).ptr;
-	return handleCPU;
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE RTVHeap::GetGPUDescriptorHandle(uint32_t index) {
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((descriptorSizeRTV * index)).ptr;
-	return handleGPU;
-}
-
-uint32_t RTVHeap::CreateRenderTargetView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format) {
+void RTVHeap::CreateRenderTargetView(ColorBuffer& resource, DXGI_FORMAT format) {
 	index_++;
 	//ディスクリプタの最大数を超えていたら止める
 	if (index_ > numDescriptors_) {
@@ -47,7 +35,19 @@ uint32_t RTVHeap::CreateRenderTargetView(const Microsoft::WRL::ComPtr<ID3D12Reso
 
 	//RTVの作成
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = GetCPUDescriptorHandle(index_);
-	device_->CreateRenderTargetView(resource.Get(), &rtvDesc, rtvHandle);
+	device_->CreateRenderTargetView(resource.GetResource(), &rtvDesc, rtvHandle);
 
-	return index_;
+	resource.SetRTVHandle(rtvHandle);
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE RTVHeap::GetCPUDescriptorHandle(uint32_t index) {
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((descriptorSizeRTV * index)).ptr;
+	return handleCPU;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE RTVHeap::GetGPUDescriptorHandle(uint32_t index) {
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((descriptorSizeRTV * index)).ptr;
+	return handleGPU;
 }

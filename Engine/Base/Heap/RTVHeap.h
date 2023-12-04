@@ -1,5 +1,6 @@
 #pragma once
 #include "Heap.h"
+#include "Engine/Base/Buffer/ColorBuffer.h"
 
 class RTVHeap : public Heap {
 public:
@@ -11,8 +12,16 @@ public:
 	/// </summary>
 	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	void Initialize(ID3D12Device* device, UINT numDescriptors) override;
-	
+	void Create(ID3D12Device* device, UINT numDescriptors) override;
+
+	/// <summary>
+	/// RTVを作成
+	/// </summary>
+	/// <param name="resource"></param>
+	/// <param name="format"></param>
+	void CreateRenderTargetView(ColorBuffer& resource, DXGI_FORMAT format);
+
+private:
 	/// <summary>
 	/// CPUディスクリプタハンドルを取得
 	/// </summary>
@@ -30,14 +39,6 @@ public:
 	/// <param name="index"></param>
 	/// <returns></returns>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index) override;
-
-	/// <summary>
-	/// RTVの作成
-	/// </summary>
-	/// <param name="resource"></param>
-	/// <param name="format"></param>
-	/// <returns></returns>
-	uint32_t CreateRenderTargetView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format);
 
 private:
 

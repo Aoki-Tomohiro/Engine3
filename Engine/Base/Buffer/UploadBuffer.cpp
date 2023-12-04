@@ -1,9 +1,5 @@
 #include "UploadBuffer.h"
 
-UploadBuffer::~UploadBuffer() {
-
-}
-
 void UploadBuffer::Create(ID3D12Device* device, size_t sizeInBytes) {
 	//デバイスを取得
 	device_ = device;

@@ -8,7 +8,7 @@ public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~TextureResource() override;
+	~TextureResource() override = default;
 
 	/// <summary>
 	/// 作成
@@ -21,25 +21,25 @@ public:
 	/// Cpuハンドルを取得
 	/// </summary>
 	/// <returns></returns>
-	const D3D12_CPU_DESCRIPTOR_HANDLE& GetCpuHandle() const { return cpuHandle_; };
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetSRVCpuHandle() const { return cpuHandle_; };
 
 	/// <summary>
 	/// Cpuハンドルを設定
 	/// </summary>
 	/// <param name="cpuHandle"></param>
-	void SetCpuHandle(const D3D12_CPU_DESCRIPTOR_HANDLE& cpuHandle) { cpuHandle_ = cpuHandle; };
+	void SetSRVCpuHandle(const D3D12_CPU_DESCRIPTOR_HANDLE& cpuHandle) { cpuHandle_ = cpuHandle; };
 
 	/// <summary>
 	/// Gpuハンドルを取得
 	/// </summary>
 	/// <returns></returns>
-	const D3D12_GPU_DESCRIPTOR_HANDLE& GetGpuHandle() const { return gpuHandle_; };
+	const D3D12_GPU_DESCRIPTOR_HANDLE& GetSRVGpuHandle() const { return gpuHandle_; };
 
 	/// <summary>
 	/// Gpuハンドルを設定
 	/// </summary>
 	/// <param name="cpuHandle"></param>
-	void SetGpuHandle(const D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle) { gpuHandle_ = gpuHandle; };
+	void SetSRVGpuHandle(const D3D12_GPU_DESCRIPTOR_HANDLE& gpuHandle) { gpuHandle_ = gpuHandle; };
 
 	/// <summary>
 	/// リソースの設定を取得

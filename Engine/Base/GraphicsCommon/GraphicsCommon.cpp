@@ -57,9 +57,9 @@ void GraphicsCommon::PreDraw() {
 
 	//ディスクリプタハンドルを取得
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2]{};
-	rtvHandles[0] = rtvDescriptorHeap_->GetCPUDescriptorHandle(0);
-	rtvHandles[1] = rtvDescriptorHeap_->GetCPUDescriptorHandle(1);
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandle(0);
+	rtvHandles[0] = swapChainResource_[0]->GetRTVHandle();
+	rtvHandles[1] = swapChainResource_[1]->GetRTVHandle();
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthStencilResource_->GetDSVHandle();
 	//描画先のRTVとDSVを設定する
 	commandList_->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
 
@@ -141,15 +141,15 @@ void GraphicsCommon::ClearRenderTarget() {
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 	//ディスクリプタハンドルを取得
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2]{};
-	rtvHandles[0] = rtvDescriptorHeap_->GetCPUDescriptorHandle(0);
-	rtvHandles[1] = rtvDescriptorHeap_->GetCPUDescriptorHandle(1);
+	rtvHandles[0] = swapChainResource_[0]->GetRTVHandle();
+	rtvHandles[1] = swapChainResource_[1]->GetRTVHandle();
 	//指定した色で画面全体をクリアする
 	const float* clearColor = swapChainResource_[backBufferIndex]->GetClearColor();
 	commandList_->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
 }
 
 void GraphicsCommon::ClearDepthBuffer() {
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescriptorHeap_->GetCPUDescriptorHandle(0);
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthStencilResource_->GetDSVHandle();
 	commandList_->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
@@ -313,11 +313,11 @@ void GraphicsCommon::CreateFence() {
 void GraphicsCommon::CreateDescriptorHeaps() {
 	//RTVDescriptorHeapの作成
 	rtvDescriptorHeap_ = std::make_unique<RTVHeap>();
-	rtvDescriptorHeap_->Initialize(device_.Get(), 2);
+	rtvDescriptorHeap_->Create(device_.Get(), 2);
 
 	//DSVDescriptorHeapの作成
 	dsvDescriptorHeap_ = std::make_unique<DSVHeap>();
-	dsvDescriptorHeap_->Initialize(device_.Get(), 1);
+	dsvDescriptorHeap_->Create(device_.Get(), 1);
 }
 
 void GraphicsCommon::CreateSwapChainResources() {
@@ -334,8 +334,7 @@ void GraphicsCommon::CreateSwapChainResources() {
 void GraphicsCommon::CreateRenderTargetViews() {
 	// レンダーターゲットビューの作成
 	for (uint32_t i = 0; i < 2; i++) {
-		uint32_t rtvIndex = rtvDescriptorHeap_->CreateRenderTargetView(swapChainResource_[i]->GetResource(), DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-		swapChainResource_[i]->SetRTVHandle(rtvDescriptorHeap_->GetCPUDescriptorHandle(rtvIndex));
+		rtvDescriptorHeap_->CreateRenderTargetView(*swapChainResource_[i], DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 	}
 }
 
@@ -345,8 +344,7 @@ void GraphicsCommon::CreateDepthBufferAndView() {
 	depthStencilResource_->Create(device_.Get(), app_->kClientWidth, app_->kClientHeight, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
 	// DepthStencilViewの作成
-	uint32_t dsvIndex = dsvDescriptorHeap_->CreateDepthStencilView(depthStencilResource_->GetResource(), DXGI_FORMAT_D24_UNORM_S8_UINT);
-	depthStencilResource_->SetDSVHandle(dsvDescriptorHeap_->GetCPUDescriptorHandle(dsvIndex));
+	dsvDescriptorHeap_->CreateDepthStencilView(*depthStencilResource_, DXGI_FORMAT_D24_UNORM_S8_UINT);
 }
 
 void GraphicsCommon::InitializeFixFPS() {

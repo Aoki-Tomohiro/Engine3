@@ -1,5 +1,6 @@
 #pragma once
 #include "Heap.h"
+#include "Engine/Base/Buffer/DepthBuffer.h"
 
 class DSVHeap : public Heap {
 public:
@@ -11,8 +12,16 @@ public:
 	/// </summary>
 	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	void Initialize(ID3D12Device* device, UINT numDescriptors) override;
+	void Create(ID3D12Device* device, UINT numDescriptors) override;
 
+	/// <summary>
+	/// 作成
+	/// </summary>
+	/// <param name="resource"></param>
+	/// <param name="format"></param>
+	void CreateDepthStencilView(DepthBuffer& resource, DXGI_FORMAT format);
+
+private:
 	/// <summary>
 	/// CPUディスクリプタハンドルを取得
 	/// </summary>
@@ -31,14 +40,6 @@ public:
 	/// <returns></returns>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index) override;
 
-	/// <summary>
-	/// DSVの作成
-	/// </summary>
-	/// <param name="resource"></param>
-	/// <param name="format"></param>
-	/// <returns></returns>
-	uint32_t CreateDepthStencilView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format);
-	
 private:
 
 };

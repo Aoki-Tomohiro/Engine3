@@ -129,14 +129,27 @@ private:
 	/// パーティクル用のPSOを作成
 	/// </summary>
 	void CreateParticlePipelineState();
+
+	/// <summary>
+	/// ガウシアンブラー用のPSOを作成
+	/// </summary>
+	void CreateGaussianBlurPipelineState();
+
+	/// <summary>
+	/// ポストエフェクト用のPSOを作成
+	/// </summary>
+	void CreatePostEffectPipelineState();
+
+	/// <summary>
+	/// ポストエフェクトの適用
+	/// </summary>
+	void ApplyPostEffect();
 	
 private:
 	//インスタンス
 	static Renderer* instance_;
-	//デバイス
-	ID3D12Device* device_ = nullptr;
-	//コマンドリスト
-	ID3D12GraphicsCommandList* commandList_ = nullptr;
+	//GraphicsCommon
+	GraphicsCommon* graphicsCommon_ = nullptr;
 	//DXC
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_ = nullptr;
 	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_ = nullptr;
@@ -149,5 +162,12 @@ private:
 	std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> modelPipelineStates_{};
 	std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> spritePipelineStates_{};
 	std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> particlePipelineStates_{};
+	//Resource
+	std::unique_ptr<ColorBuffer> sceneColorBuffer_ = nullptr;
+	std::unique_ptr<DepthBuffer> sceneDepthBuffer_ = nullptr;
+	//Heap
+	std::unique_ptr<RTVHeap> rtvHeap_ = nullptr;
+	std::unique_ptr<SRVHeap> srvHeap_ = nullptr;
+	std::unique_ptr<DSVHeap> dsvHeap_ = nullptr;
 };
 

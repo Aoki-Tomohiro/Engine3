@@ -13,7 +13,7 @@ void ImGuiManager::Initialize() {
 
 	//SRVDescriptorHeapの作成
 	srvDescriptorHeap_ = std::make_unique<SRVHeap>();
-	srvDescriptorHeap_->Initialize(core_->GetDevice(), 1);
+	srvDescriptorHeap_->Create(core_->GetDevice(), 1);
 
 	//ImGuiの初期化
 	IMGUI_CHECKVERSION();

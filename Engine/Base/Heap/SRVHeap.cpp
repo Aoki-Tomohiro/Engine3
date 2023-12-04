@@ -2,7 +2,7 @@
 
 uint32_t SRVHeap::descriptorSizeSRV = 0;
 
-void SRVHeap::Initialize(ID3D12Device* device, UINT numDescriptors) {
+void SRVHeap::Create(ID3D12Device* device, UINT numDescriptors) {
 	//デバイスを取得
 	device_ = device;
 
@@ -21,19 +21,7 @@ void SRVHeap::Initialize(ID3D12Device* device, UINT numDescriptors) {
 	assert(SUCCEEDED(hr));
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE SRVHeap::GetCPUDescriptorHandle(uint32_t index) {
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((descriptorSizeSRV * index)).ptr;
-	return handleCPU;
-}
-
-D3D12_GPU_DESCRIPTOR_HANDLE SRVHeap::GetGPUDescriptorHandle(uint32_t index) {
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((descriptorSizeSRV * index)).ptr;
-	return handleGPU;
-}
-
-uint32_t SRVHeap::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format) {
+void SRVHeap::CreateShaderResourceView(ColorBuffer& resource, DXGI_FORMAT format) {
 	index_++;
 	//ディスクリプタの最大数を超えていたら止める
 	if (index_ > numDescriptors_) {
@@ -48,13 +36,15 @@ uint32_t SRVHeap::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Re
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 	//SRVの作成
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = GetCPUDescriptorHandle(index_);
-	device_->CreateShaderResourceView(resource.Get(), &srvDesc, srvHandle);
+	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = GetCPUDescriptorHandle(index_);
+	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = GetGPUDescriptorHandle(index_);
+	device_->CreateShaderResourceView(resource.GetResource(), &srvDesc, srvCpuHandle);
 
-	return index_;
+	resource.SetSRVCpuHandle(srvCpuHandle);
+	resource.SetSRVGpuHandle(srvGpuHandle);
 }
 
-uint32_t SRVHeap::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format, UINT mipLevels) {
+void SRVHeap::CreateShaderResourceView(TextureResource& resource, DXGI_FORMAT format, UINT mipLevels) {
 	index_++;
 	//ディスクリプタの最大数を超えていたら止める
 	if (index_ > numDescriptors_) {
@@ -69,13 +59,15 @@ uint32_t SRVHeap::CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Re
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 
 	//SRVの作成
-	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = GetCPUDescriptorHandle(index_);
-	device_->CreateShaderResourceView(resource.Get(), &srvDesc, srvHandle);
+	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = GetCPUDescriptorHandle(index_);
+	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = GetGPUDescriptorHandle(index_);
+	device_->CreateShaderResourceView(resource.GetResource(), &srvDesc, srvCpuHandle);
 
-	return index_;
+	resource.SetSRVCpuHandle(srvCpuHandle);
+	resource.SetSRVGpuHandle(srvGpuHandle);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE SRVHeap::CreateInstancingShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& instancingResource, uint32_t kNumInstance, size_t size) {
+D3D12_GPU_DESCRIPTOR_HANDLE SRVHeap::CreateInstancingShaderResourceView(UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size) {
 	index_++;
 	//ディスクリプタの最大数を超えていたら止める
 	if (index_ > numDescriptors_) {
@@ -93,7 +85,19 @@ D3D12_GPU_DESCRIPTOR_HANDLE SRVHeap::CreateInstancingShaderResourceView(const Mi
 
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandleCpu = GetCPUDescriptorHandle(index_);
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGpu = GetGPUDescriptorHandle(index_);
-	device_->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, srvHandleCpu);
+	device_->CreateShaderResourceView(instancingResource.GetResource(), &instancingSrvDesc, srvHandleCpu);
 
 	return srvHandleGpu;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE SRVHeap::GetCPUDescriptorHandle(uint32_t index) {
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += static_cast<D3D12_CPU_DESCRIPTOR_HANDLE>((descriptorSizeSRV * index)).ptr;
+	return handleCPU;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE SRVHeap::GetGPUDescriptorHandle(uint32_t index) {
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += static_cast<D3D12_GPU_DESCRIPTOR_HANDLE>((descriptorSizeSRV * index)).ptr;
+	return handleGPU;
 }

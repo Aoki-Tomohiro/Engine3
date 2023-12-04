@@ -1,5 +1,9 @@
 #pragma once
+#pragma once
 #include "Heap.h"
+#include "Engine/Base/Buffer/TextureResource.h"
+#include "Engine/Base/Buffer/ColorBuffer.h"
+#include "Engine/Base/Buffer/UploadBuffer.h"
 
 class SRVHeap : public Heap {
 public:
@@ -11,8 +15,33 @@ public:
 	/// </summary>
 	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	void Initialize(ID3D12Device* device, UINT numDescriptors) override;
+	void Create(ID3D12Device* device, UINT numDescriptors) override;
 
+	/// <summary>
+	/// SRVの作成
+	/// </summary>
+	/// <param name="resource"></param>
+	/// <param name="format"></param>
+	void CreateShaderResourceView(ColorBuffer& resource, DXGI_FORMAT format);
+
+	/// <summary>
+	/// SRVの作成
+	/// </summary>
+	/// <param name="resource"></param>
+	/// <param name="format"></param>
+	/// <param name="mipLevels"></param>
+	void CreateShaderResourceView(TextureResource& resource, DXGI_FORMAT format, UINT mipLevels);
+
+	/// <summary>
+	/// Instancing用のSRVの作成
+	/// </summary>
+	/// <param name="instancingResource"></param>
+	/// <param name="kNumInstance"></param>
+	/// <param name="size"></param>
+	/// <returns></returns>
+	D3D12_GPU_DESCRIPTOR_HANDLE CreateInstancingShaderResourceView(UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size);
+
+private:
 	/// <summary>
 	/// CPUディスクリプタハンドルを取得
 	/// </summary>
@@ -31,32 +60,6 @@ public:
 	/// <returns></returns>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index) override;
 
-	/// <summary>
-	/// SRVの作成
-	/// </summary>
-	/// <param name="resource"></param>
-	/// <param name="format"></param>
-	/// <returns></returns>
-	uint32_t CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format);
-
-	/// <summary>
-	/// SRVの作成
-	/// </summary>
-	/// <param name="resource"></param>
-	/// <param name="format"></param>
-	/// <param name="mipLevels"></param>
-	/// <returns></returns>
-	uint32_t CreateShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& resource, DXGI_FORMAT format, UINT mipLevels);
-
-	/// <summary>
-	/// Instancing用のSRVの作成
-	/// </summary>
-	/// <param name="instancingResource"></param>
-	/// <param name="kNumInstance"></param>
-	/// <param name="size"></param>
-	/// <returns></returns>
-	D3D12_GPU_DESCRIPTOR_HANDLE CreateInstancingShaderResourceView(const Microsoft::WRL::ComPtr<ID3D12Resource>& instancingResource, uint32_t kNumInstance, size_t size);
-
 private:
-
 };
+

@@ -7,7 +7,7 @@ public:
 	/// <summary>
 	/// デストラクタ
 	/// </summary>
-	~DepthBuffer() override;
+	~DepthBuffer() override = default;
 
 	/// <summary>
 	/// 作成
