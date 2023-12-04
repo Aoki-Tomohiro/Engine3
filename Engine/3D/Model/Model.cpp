@@ -1,16 +1,15 @@
 #include "Model.h"
+#include "Engine/Base/Graphics/GraphicsContext.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 #include <cassert>
 #include <fstream>
 #include <sstream>
 
 //実体定義
-ID3D12GraphicsCommandList* Model::sCommandList_ = nullptr;
 std::vector<Model::ModelData> Model::sModelDatas_{};
 
 void Model::StaticInitialize() {
-	//コマンドリストを取得
-	sCommandList_ = GraphicsCommon::GetInstance()->GetCommandList();
+
 }
 
 Model* Model::CreateFromOBJ(const std::string& directoryPath, const std::string& filename) {
@@ -67,14 +66,16 @@ void Model::Draw(const WorldTransform& worldTransform, const Camera& camera) {
 	//DirectionalLightの更新
 	directionalLight_->Update();
 
+	//GraphicsContextのインスタンスを取得
+	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
 	//頂点データを設定
 	mesh_->SetGraphicsCommand();
 	//マテリアルを設定
 	material_->SetGraphicsCommand(UINT(RootParameterIndex::Material));
 	//WorldTransformを設定
-	sCommandList_->SetGraphicsRootConstantBufferView(UINT(RootParameterIndex::WorldlTransform), worldTransform.GetConstantBuffer()->GetGPUVirtualAddress());
+	graphicsContext->SetConstantBuffer(UINT(RootParameterIndex::WorldlTransform), worldTransform.GetConstantBuffer()->GetGPUVirtualAddress());
 	//Cameraを設定
-	sCommandList_->SetGraphicsRootConstantBufferView(UINT(RootParameterIndex::Camera), camera.GetConstantBuffer()->GetGPUVirtualAddress());
+	graphicsContext->SetConstantBuffer(UINT(RootParameterIndex::Camera), camera.GetConstantBuffer()->GetGPUVirtualAddress());
 	//DescriptorHeapを設定
 	TextureManager::GetInstance()->SetGraphicsDescriptorHeap();
 	//DescriptorTableを設定
@@ -91,14 +92,16 @@ void Model::Draw(const WorldTransform& worldTransform, const Camera& camera, uin
 	//DirectionalLightの更新
 	directionalLight_->Update();
 
+	//GraphicsContextのインスタンスを取得
+	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
 	//頂点データを設定
 	mesh_->SetGraphicsCommand();
 	//マテリアルを設定
 	material_->SetGraphicsCommand(UINT(RootParameterIndex::Material));
 	//WorldTransformを設定
-	sCommandList_->SetGraphicsRootConstantBufferView(UINT(RootParameterIndex::WorldlTransform), worldTransform.GetConstantBuffer()->GetGPUVirtualAddress());
+	graphicsContext->SetConstantBuffer(UINT(RootParameterIndex::WorldlTransform), worldTransform.GetConstantBuffer()->GetGPUVirtualAddress());
 	//Cameraを設定
-	sCommandList_->SetGraphicsRootConstantBufferView(UINT(RootParameterIndex::Camera), camera.GetConstantBuffer()->GetGPUVirtualAddress());
+	graphicsContext->SetConstantBuffer(UINT(RootParameterIndex::Camera), camera.GetConstantBuffer()->GetGPUVirtualAddress());
 	//DescriptorHeapを設定
 	TextureManager::GetInstance()->SetGraphicsDescriptorHeap();
 	//DescriptorTableを設定

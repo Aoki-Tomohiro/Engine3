@@ -2,9 +2,9 @@
 
 uint32_t RTVHeap::descriptorSizeRTV = 0;
 
-void RTVHeap::Create(ID3D12Device* device, UINT numDescriptors) {
+void RTVHeap::Create(UINT numDescriptors) {
 	//デバイスを取得
-	device_ = device;
+	device_ = GraphicsDevice::GetInstance()->GetDevice();
 
 	//インクリメントサイズの初期化
 	descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);

@@ -1,5 +1,4 @@
 #pragma once
-#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
 #include "Engine/Base/Buffer/UploadBuffer.h"
 #include "Engine/Math/Structs/Vector3.h"
 #include "Engine/Math/Structs/Vector4.h"

@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "Heap.h"
 #include "Engine/Base/Buffer/TextureResource.h"
 #include "Engine/Base/Buffer/ColorBuffer.h"
@@ -11,11 +10,10 @@ public:
 	static uint32_t descriptorSizeSRV;
 
 	/// <summary>
-	/// 初期化
+	/// 作成
 	/// </summary>
-	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	void Create(ID3D12Device* device, UINT numDescriptors) override;
+	void Create(UINT numDescriptors) override;
 
 	/// <summary>
 	/// SRVの作成

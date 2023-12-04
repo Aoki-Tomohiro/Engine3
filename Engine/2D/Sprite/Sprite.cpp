@@ -1,15 +1,10 @@
 #include "Sprite.h"
+#include "Engine/Base/Graphics/GraphicsContext.h"
 
 //実体定義
-ID3D12Device* Sprite::sDevice_ = nullptr;
-ID3D12GraphicsCommandList* Sprite::sCommandList_ = nullptr;
 Matrix4x4 Sprite::sMatProjection_{};
 
 void Sprite::StaticInitialize() {
-	//デバイスの取得
-	sDevice_ = GraphicsCommon::GetInstance()->GetDevice();
-	//コマンドリストの取得
-	sCommandList_ = GraphicsCommon::GetInstance()->GetCommandList();
 	//平行投影行列の作成
 	sMatProjection_ = MakeOrthographicMatrix(0.0f, 0.0f, 1280.0f, 720.0f, 0.0f, 100.0f);
 }
@@ -34,20 +29,22 @@ void Sprite::Draw() {
 	//行列の更新
 	UpdateMatrix();
 
+	//GraphicsContextのインスタンスを取得
+	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
 	//VBVを設定
-	sCommandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	graphicsContext->SetVertexBuffer(vertexBufferView_);
 	//形状を設定。PSOに設定しているものとは別。同じものを設定すると考えておけば良い
-	sCommandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	graphicsContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//マテリアルCBufferの場所を設定
-	sCommandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	graphicsContext->SetConstantBuffer(0, materialResource_->GetGPUVirtualAddress());
 	//wvp用のCBufferの場所を設定
-	sCommandList_->SetGraphicsRootConstantBufferView(1, wvpResource_->GetGPUVirtualAddress());
+	graphicsContext->SetConstantBuffer(1, wvpResource_->GetGPUVirtualAddress());
 	//DescriptorHeapを設定
 	TextureManager::GetInstance()->SetGraphicsDescriptorHeap();
 	//DescriptorTableを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(2, textureHandle_);
 	//描画!(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	sCommandList_->DrawInstanced(6, 1, 0, 0);
+	graphicsContext->DrawInstanced(6, 1);
 }
 
 void Sprite::Initialize(uint32_t textureHandle, Vector2 position) {
@@ -109,7 +106,7 @@ void Sprite::Initialize(uint32_t textureHandle, Vector2 position) {
 void Sprite::CreateVertexBuffer() {
 	//頂点リソースを作る
 	vertexBuffer_ = std::make_unique<UploadBuffer>();
-	vertexBuffer_->Create(sDevice_, sizeof(VertexData) * 6);
+	vertexBuffer_->Create(sizeof(VertexData) * 6);
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点6つ分のサイズ
@@ -167,7 +164,7 @@ void Sprite::UpdateVertexBuffer() {
 void Sprite::CreateMaterialResource() {
 	//マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
 	materialResource_ = std::make_unique<UploadBuffer>();
-	materialResource_->Create(sDevice_,sizeof(MaterialData));
+	materialResource_->Create(sizeof(MaterialData));
 	//マテリアルにデータを書き込む
 	materialData_ = static_cast<MaterialData*>(materialResource_->Map());
 	//今回は赤を書き込んでみる
@@ -191,7 +188,7 @@ void Sprite::UpdateMaterial() {
 void Sprite::CreateWVPResource() {
 	//WVP用のリソースを作る。Matrix4x4 1つ分のサイズを用意する
 	wvpResource_ = std::make_unique<UploadBuffer>();
-	wvpResource_->Create(sDevice_, sizeof(Matrix4x4));
+	wvpResource_->Create(sizeof(Matrix4x4));
 	//データを書き込む
 	wvpData_ = static_cast<Matrix4x4*>(wvpResource_->Map());
 	//単位行列を書き込んでおく

@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Base/Windows/Application.h"
-#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 #include "Engine/Base/ImGuiManager/ImGuiManager.h"
 #include "Engine/Base/Renderer/Renderer.h"
@@ -50,7 +50,7 @@ protected:
 	//WindowsApplication
 	Application* app_ = nullptr;
 	//GraphicsCommon
-	GraphicsCommon* core_ = nullptr;
+	GraphicsCommon* graphicsCommon_ = nullptr;
 	//テクスチャマネージャー
 	TextureManager* textureManager_ = nullptr;
 	//ImGuiManager

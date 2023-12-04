@@ -1,7 +1,5 @@
 #pragma once
 #include "GpuResource.h"
-#include <cstdint>
-#include <dxgi1_6.h>
 
 class ColorBuffer : public GpuResource {
 public:
@@ -13,12 +11,11 @@ public:
 	/// <summary>
 	/// 作成
 	/// </summary>
-	/// <param name="device"></param>
 	/// <param name="width"></param>
 	/// <param name="height"></param>
 	/// <param name="format"></param>
 	/// <param name="clearColor"></param>
-	void Create(ID3D12Device* device, int32_t width, int32_t height, DXGI_FORMAT format, float* clearColor);
+	void Create(int32_t width, int32_t height, DXGI_FORMAT format, float* clearColor);
 
 	/// <summary>
 	/// スワップチェーンから作成

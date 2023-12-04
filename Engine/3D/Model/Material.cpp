@@ -1,11 +1,10 @@
 #include "Material.h"
-#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
+#include "Engine/Base/Graphics/GraphicsContext.h"
 
 void Material::Initialize() {
 	//マテリアルリソースの作成
-	ID3D12Device* device = GraphicsCommon::GetInstance()->GetDevice();
 	materialResource_ = std::make_unique<UploadBuffer>();
-	materialResource_->Create(device, sizeof(ConstBufferDataMaterial));
+	materialResource_->Create(sizeof(ConstBufferDataMaterial));
 
 	//マテリアルリソースに書き込む
 	materialData_ = static_cast<ConstBufferDataMaterial*>(materialResource_->Map());
@@ -28,8 +27,8 @@ void Material::Update() {
 }
 
 void Material::SetGraphicsCommand(UINT rootParameterIndex) {
-	//コマンドリストを取得
-	ID3D12GraphicsCommandList* commandList = GraphicsCommon::GetInstance()->GetCommandList();
+	//GraphicsContextのインスタンスを取得
+	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
 	//マテリアルリソースを設定
-	commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, materialResource_->GetGPUVirtualAddress());
+	graphicsContext->SetConstantBuffer(rootParameterIndex, materialResource_->GetGPUVirtualAddress());
 }

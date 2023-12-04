@@ -1,7 +1,6 @@
 #pragma once
-#include <cassert>
-#include <d3d12.h>
-#include <wrl.h>
+#include "Engine/Base/Graphics/GraphicsDevice.h"
+#include <cstdint>
 
 class GpuResource {
 public:

@@ -8,11 +8,10 @@ public:
 	static uint32_t descriptorSizeDSV;
 
 	/// <summary>
-	/// 初期化
+	/// 作成
 	/// </summary>
-	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	void Create(ID3D12Device* device, UINT numDescriptors) override;
+	void Create(UINT numDescriptors) override;
 
 	/// <summary>
 	/// 作成

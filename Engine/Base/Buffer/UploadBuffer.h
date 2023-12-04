@@ -11,9 +11,8 @@ public:
 	/// <summary>
 	/// 作成
 	/// </summary>
-	/// <param name="device"></param>
 	/// <param name="sizeInBytes"></param>
-	void Create(ID3D12Device* device, size_t sizeInBytes);
+	void Create(size_t sizeInBytes);
 
 	/// <summary>
 	/// マップ

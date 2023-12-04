@@ -8,11 +8,10 @@ public:
 	static uint32_t descriptorSizeRTV;
 
 	/// <summary>
-	/// 初期化
+	/// 作成
 	/// </summary>
-	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	void Create(ID3D12Device* device, UINT numDescriptors) override;
+	void Create(UINT numDescriptors) override;
 
 	/// <summary>
 	/// RTVを作成

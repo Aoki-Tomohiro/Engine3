@@ -33,8 +33,8 @@ void EngineCore::Initialize() {
 	app_->CreateGameWindow(L"DirectXGame", Application::kClientWidth, Application::kClientHeight);
 
 	//GraphicsCoreの初期化
-	core_ = GraphicsCommon::GetInstance();
-	core_->Initialize();
+	graphicsCommon_ = GraphicsCommon::GetInstance();
+	graphicsCommon_->Initialize();
 
 	//テクスチャマネージャーの初期化
 	textureManager_ = TextureManager::GetInstance();
@@ -88,16 +88,10 @@ void EngineCore::Update() {
 
 void EngineCore::Draw() {
 	//描画前処理
-	renderer_->PreDraw();
+	graphicsCommon_->PreDraw();
 
 	//シーンの描画
 	sceneManager_->Draw();
-
-	//描画後処理
-	renderer_->PostDraw();
-
-	//描画前処理
-	core_->PreDraw();
 
 	//スプライトの描画
 	sceneManager_->DrawUI();
@@ -106,7 +100,7 @@ void EngineCore::Draw() {
 	imguiManager_->Draw();
 
 	//描画後処理
-	core_->PostDraw();
+	graphicsCommon_->PostDraw();
 }
 
 bool EngineCore::IsEndRequest() {

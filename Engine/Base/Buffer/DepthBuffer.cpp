@@ -1,8 +1,8 @@
 #include "DepthBuffer.h"
 
-void DepthBuffer::Create(ID3D12Device* device, int32_t width, int32_t height, DXGI_FORMAT format) {
+void DepthBuffer::Create(int32_t width, int32_t height, DXGI_FORMAT format) {
 	//デバイスを取得
-	device_ = device;
+	device_ = GraphicsDevice::GetInstance()->GetDevice();
 
 	//リソースの状態
 	resourceState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;

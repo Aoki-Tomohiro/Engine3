@@ -1,8 +1,8 @@
 #include "UploadBuffer.h"
 
-void UploadBuffer::Create(ID3D12Device* device, size_t sizeInBytes) {
+void UploadBuffer::Create(size_t sizeInBytes) {
 	//デバイスを取得
-	device_ = device;
+	device_ = GraphicsDevice::GetInstance()->GetDevice();
 
 	//バッファのサイズの設定
 	bufferSize_ = sizeInBytes;

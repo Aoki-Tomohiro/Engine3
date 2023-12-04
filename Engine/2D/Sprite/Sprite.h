@@ -1,5 +1,4 @@
 #pragma once
-#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 #include "Engine/Math/MathFunction.h"
 
@@ -252,10 +251,6 @@ private:
 	void AdjustTextureSize();
 
 private:
-	//デバイス
-	static ID3D12Device* sDevice_;
-	//コマンドリスト
-	static ID3D12GraphicsCommandList* sCommandList_;
 	//射影行列
 	static Matrix4x4 sMatProjection_;
 	//頂点バッファ

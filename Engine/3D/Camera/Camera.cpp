@@ -2,9 +2,8 @@
 
 void Camera::Initialize() {
 	//CBVの作成
-	ID3D12Device* device = GraphicsCommon::GetInstance()->GetDevice();
 	constBuff_ = std::make_unique<UploadBuffer>();
-	constBuff_->Create(device, sizeof(ConstBuffDataViewProjection));
+	constBuff_->Create(sizeof(ConstBuffDataViewProjection));
 }
 
 void Camera::TransferMatrix() {

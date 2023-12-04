@@ -99,10 +99,6 @@ private:
 private:
 	//インスタンス
 	static ParticleSystem* instance_;
-	//デバイス
-	static ID3D12Device* sDevice_;
-	//コマンドリスト
-	static ID3D12GraphicsCommandList* sCommandList_;
 	//Instancing用のWorldTransform
 	std::unique_ptr<UploadBuffer> instancingResource_ = nullptr;
 	ParticleForGPU* instancingData_ = nullptr;

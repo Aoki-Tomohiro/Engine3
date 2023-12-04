@@ -1,16 +1,12 @@
 #include "ParticleSystem.h"
-#include "Engine/Base/GraphicsCommon/GraphicsCommon.h"
+#include "Engine/Base/Graphics/GraphicsContext.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 
 //実体定義
 ParticleSystem* ParticleSystem::instance_ = nullptr;
-ID3D12Device* ParticleSystem::sDevice_ = nullptr;
-ID3D12GraphicsCommandList* ParticleSystem::sCommandList_ = nullptr;
 
 void ParticleSystem::StaticInitialize() {
-	//コマンドリストの取得
-	sCommandList_ = GraphicsCommon::GetInstance()->GetCommandList();
-	sDevice_ = GraphicsCommon::GetInstance()->GetDevice();
+
 }
 
 void ParticleSystem::Initialize() {
@@ -66,28 +62,30 @@ void ParticleSystem::Draw(const Camera& camera) {
 	//InstancingResourceの更新
 	UpdateInstancingResource(camera);
 
+	//GraphicsContextのインスタンスを取得
+	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
 	//DescriptorHeapを設定
 	TextureManager::GetInstance()->SetGraphicsDescriptorHeap();
 	//VBVを設定
-	sCommandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	graphicsContext->SetVertexBuffer(vertexBufferView_);
 	//形状を設定。PSOに設定しているものとは別。同じものを設定すると考えておけば良い
-	sCommandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	graphicsContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//マテリアルCBufferの場所を設定
-	sCommandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	graphicsContext->SetConstantBuffer(0, materialResource_->GetGPUVirtualAddress());
 	//WorldTransform用のCBufferの場所を設定
-	sCommandList_->SetGraphicsRootDescriptorTable(1, srvHandleGpu_);
+	graphicsContext->SetDescriptorTable(1, srvHandleGpu_);
 	//ViewProjection用のCBufferの場所を設定
-	sCommandList_->SetGraphicsRootConstantBufferView(2, camera.GetConstantBuffer()->GetGPUVirtualAddress());
+	graphicsContext->SetConstantBuffer(2, camera.GetConstantBuffer()->GetGPUVirtualAddress());
 	//DescriptorTableを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(3, textureHandle_);
 	//描画!(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	sCommandList_->DrawInstanced(UINT(vertices_.size()), numInstance_, 0, 0);
+	graphicsContext->DrawInstanced(UINT(vertices_.size()), numInstance_);
 }
 
 void ParticleSystem::CreateVertexBuffer() {
 	//頂点リソースを作る
 	vertexBuffer_ = std::make_unique<UploadBuffer>();
-	vertexBuffer_->Create(sDevice_, sizeof(VertexData) * vertices_.size());
+	vertexBuffer_->Create(sizeof(VertexData) * vertices_.size());
 
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexBuffer_->GetGPUVirtualAddress();
@@ -105,7 +103,7 @@ void ParticleSystem::CreateVertexBuffer() {
 void ParticleSystem::CreateMaterialResource() {
 	//マテリアル用のリソースを作る。今回はcolor1つ分のサイズを用意する
 	materialResource_ = std::make_unique<UploadBuffer>();
-	materialResource_->Create(sDevice_,sizeof(MaterialData));
+	materialResource_->Create(sizeof(MaterialData));
 	//マテリアルにデータを書き込む
 	materialData_ = static_cast<MaterialData*>(materialResource_->Map());
 	//今回は赤を書き込んでみる
@@ -117,7 +115,7 @@ void ParticleSystem::CreateMaterialResource() {
 void ParticleSystem::CreateInstancingResource() {
 	//Instancing用のWorldTransformリソースを作る
 	instancingResource_ = std::make_unique<UploadBuffer>();
-	instancingResource_->Create(sDevice_,sizeof(ParticleForGPU) * kMaxInstance);
+	instancingResource_->Create(sizeof(ParticleForGPU) * kMaxInstance);
 	//書き込むためのアドレスを取得
 	instancingData_ = static_cast<ParticleForGPU*>(instancingResource_->Map());
 	//単位行列を書き込んでおく

@@ -2,9 +2,9 @@
 
 uint32_t DSVHeap::descriptorSizeDSV = 0;
 
-void DSVHeap::Create(ID3D12Device* device, UINT numDescriptors) {
+void DSVHeap::Create(UINT numDescriptors) {
 	//デバイスを取得
-	device_ = device;
+	device_ = GraphicsDevice::GetInstance()->GetDevice();
 
 	//インクリメントサイズの初期化
 	descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);

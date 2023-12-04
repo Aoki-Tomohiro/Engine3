@@ -1,8 +1,6 @@
 #pragma once
-#include <d3d12.h>
-#include <wrl.h>
+#include "Engine/Base/Graphics/GraphicsDevice.h"
 #include <cstdint>
-#include <cassert>
 
 class Heap {
 public:
@@ -14,9 +12,8 @@ public:
 	/// <summary>
 	/// 作成
 	/// </summary>
-	/// <param name="device"></param>
 	/// <param name="numDescriptors"></param>
-	virtual void Create(ID3D12Device* device, UINT numDescriptors) = 0;
+	virtual void Create(UINT numDescriptors) = 0;
 
 	/// <summary>
 	/// ディスクリプタヒープを取得

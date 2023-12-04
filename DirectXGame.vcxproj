@@ -160,7 +160,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Base\Buffer\GpuResource.cpp" />
     <ClCompile Include="Engine\Base\Buffer\TextureResource.cpp" />
     <ClCompile Include="Engine\Base\Buffer\UploadBuffer.cpp" />
-    <ClCompile Include="Engine\Base\GraphicsCommon\GraphicsCommon.cpp" />
+    <ClCompile Include="Engine\Base\Graphics\GraphicsCommon.cpp" />
+    <ClCompile Include="Engine\Base\Graphics\GraphicsContext.cpp" />
+    <ClCompile Include="Engine\Base\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Engine\Base\Heap\DSVHeap.cpp" />
     <ClCompile Include="Engine\Base\Heap\Heap.cpp" />
     <ClCompile Include="Engine\Base\Heap\RTVHeap.cpp" />
@@ -176,8 +178,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Components\Particle\Particle.cpp" />
     <ClCompile Include="Engine\Components\Particle\ParticleEmitter.cpp" />
     <ClCompile Include="Engine\Components\Particle\ParticleSystem.cpp" />
-    <ClCompile Include="Engine\Components\PostEffects\GaussianBlur.cpp" />
-    <ClCompile Include="Engine\Components\PostEffects\PostEffects.cpp" />
     <ClCompile Include="Engine\Externals\imgui\imgui.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MinSpace</Optimization>
     </ClCompile>
@@ -225,7 +225,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Base\Buffer\GpuResource.h" />
     <ClInclude Include="Engine\Base\Buffer\TextureResource.h" />
     <ClInclude Include="Engine\Base\Buffer\UploadBuffer.h" />
-    <ClInclude Include="Engine\Base\GraphicsCommon\GraphicsCommon.h" />
+    <ClInclude Include="Engine\Base\Graphics\GraphicsCommon.h" />
+    <ClInclude Include="Engine\Base\Graphics\GraphicsContext.h" />
+    <ClInclude Include="Engine\Base\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Engine\Base\Heap\DSVHeap.h" />
     <ClInclude Include="Engine\Base\Heap\Heap.h" />
     <ClInclude Include="Engine\Base\Heap\RTVHeap.h" />
@@ -243,8 +245,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Components\Particle\Particle.h" />
     <ClInclude Include="Engine\Components\Particle\ParticleEmitter.h" />
     <ClInclude Include="Engine\Components\Particle\ParticleSystem.h" />
-    <ClInclude Include="Engine\Components\PostEffects\GaussianBlur.h" />
-    <ClInclude Include="Engine\Components\PostEffects\PostEffects.h" />
     <ClInclude Include="Engine\Externals\imgui\imconfig.h" />
     <ClInclude Include="Engine\Externals\imgui\imgui.h" />
     <ClInclude Include="Engine\Externals\imgui\imgui_impl_dx12.h" />

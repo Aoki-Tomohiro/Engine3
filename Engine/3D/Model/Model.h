@@ -92,8 +92,6 @@ private:
 	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename);
 
 private:
-	//コマンドリスト
-	static ID3D12GraphicsCommandList* sCommandList_;
 	//モデルデータ
 	static std::vector<ModelData> sModelDatas_;
 	//頂点データ

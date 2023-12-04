@@ -1,6 +1,5 @@
 #pragma once
 #include "GpuResource.h"
-#include <cstdint>
 
 class DepthBuffer : public GpuResource {
 public:
@@ -12,11 +11,10 @@ public:
 	/// <summary>
 	/// 作成
 	/// </summary>
-	/// <param name="device"></param>
 	/// <param name="width"></param>
 	/// <param name="height"></param>
 	/// <param name="format"></param>
-	void Create(ID3D12Device* device, int32_t width, int32_t height, DXGI_FORMAT format);
+	void Create(int32_t width, int32_t height, DXGI_FORMAT format);
 
 	/// <summary>
 	/// DSVハンドルを取得

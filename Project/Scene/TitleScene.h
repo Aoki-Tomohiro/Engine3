@@ -3,6 +3,7 @@
 #include "Engine/Base/Renderer/Renderer.h"
 #include "Engine/3D/Camera/Camera.h"
 #include "Engine/3D/Model/Model.h"
+#include "Engine/3D/Matrix/WorldTransform.h"
 #include "Engine/Components/Input/Input.h"
 #include "Engine/Components/Audio/Audio.h"
 
@@ -38,5 +39,9 @@ private:
 	Renderer* renderer_ = nullptr;
 	//カメラ
 	Camera camera_{};
+	//モデル
+	std::unique_ptr<Model> model_ = nullptr;
+	//ワールドトランスフォーム
+	WorldTransform worldTransform_{};
 };
 
