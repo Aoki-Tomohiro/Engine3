@@ -1,6 +1,4 @@
 #include "Renderer.h"
-#include "Engine/Base/Graphics/GraphicsCommon.h"
-#include "Engine/Base/TextureManager/TextureManager.h"
 
 //実体定義
 Renderer* Renderer::instance_ = nullptr;
@@ -18,7 +16,11 @@ void Renderer::DeleteInstance() {
 }
 
 void Renderer::Initialize() {
+	//デバイスの取得
+	graphicsCommon_ = GraphicsCommon::GetInstance();
+
 	//DescriptorHeapの作成
+	ID3D12Device* device = graphicsCommon_->GetDevice();
 	rtvHeap_ = std::make_unique<RTVHeap>();
 	rtvHeap_->Create(10);
 	srvHeap_ = std::make_unique<SRVHeap>();
@@ -54,27 +56,41 @@ void Renderer::Initialize() {
 }
 
 void Renderer::PreDraw() {
-	//GraphicsContextのインスタンスを取得
-	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
+	//コマンドリストを取得
+	ID3D12GraphicsCommandList* commandList = graphicsCommon_->GetCommandList();
 	//リソースバリアを張る
-	graphicsContext->TransitionResource(*sceneColorBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	graphicsCommon_->TransitionResource(*sceneColorBuffer_, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	//レンダーターゲットを設定
-	graphicsContext->SetRenderTargets(1, &sceneColorBuffer_->GetRTVHandle(), sceneDepthBuffer_->GetDSVHandle());
+	commandList->OMSetRenderTargets(1, &sceneColorBuffer_->GetRTVHandle(), false, &sceneDepthBuffer_->GetDSVHandle());
 	//レンダーターゲットをクリア
-	graphicsContext->ClearRenderTarget(*sceneColorBuffer_);
+	commandList->ClearRenderTargetView(sceneColorBuffer_->GetRTVHandle(), sceneColorBuffer_->GetClearColor(), 0, nullptr);
 
+	//ビューポート
+	D3D12_VIEWPORT viewport{};
+	//クライアント領域のサイズと一緒にして画面全体に表示
+	viewport.Width = FLOAT(Application::GetInstance()->kClientWidth);
+	viewport.Height = FLOAT(Application::GetInstance()->kClientHeight);
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
 	//ビューポートを設定
-	graphicsContext->SetViewport(Application::kClientWidth, Application::kClientHeight, 0, 0, 0.0f, 1.0f);
+	commandList->RSSetViewports(1, &viewport);
 
+	//シザー矩形
+	D3D12_RECT scissorRect{};
+	//基本的にビューポートと同じ矩形が構成されるようにする
+	scissorRect.left = 0;
+	scissorRect.right = Application::GetInstance()->kClientWidth;
+	scissorRect.top = 0;
+	scissorRect.bottom = Application::GetInstance()->kClientHeight;
 	//シザーを設定
-	graphicsContext->SetScissorRect(0, Application::kClientWidth, 0, Application::kClientHeight);
+	commandList->RSSetScissorRects(1, &scissorRect);
 }
 
 void Renderer::PostDraw() {
-	//GraphicsContextのインスタンスを取得
-	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
 	//リソースバリアを張る
-	graphicsContext->TransitionResource(*sceneColorBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	graphicsCommon_->TransitionResource(*sceneColorBuffer_, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
 void Renderer::Draw() {
@@ -82,12 +98,12 @@ void Renderer::Draw() {
 }
 
 void Renderer::PreDrawModels(ModelRenderingType type) {
-	//GraphicsContextのインスタンスを取得
-	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
+	//コマンドリストを取得
+	ID3D12GraphicsCommandList* commandList = graphicsCommon_->GetCommandList();
 	//RootSignatureを設定
-	graphicsContext->SetRootSignature(modelRootSignature_.Get());
+	commandList->SetGraphicsRootSignature(modelRootSignature_.Get());
 	//PipelineStateを設定
-	graphicsContext->SetPipelineState(modelPipelineStates_[type].Get());
+	commandList->SetPipelineState(modelPipelineStates_[type].Get());
 }
 
 void Renderer::PostDrawModels() {
@@ -95,12 +111,12 @@ void Renderer::PostDrawModels() {
 }
 
 void Renderer::PreDrawSprites(BlendMode blendMode) {
-	//GraphicsContextのインスタンスを取得
-	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
+	//コマンドリストを取得
+	ID3D12GraphicsCommandList* commandList = graphicsCommon_->GetCommandList();
 	//RootSignatureを設定
-	graphicsContext->SetRootSignature(spriteRootSignature_.Get());
+	commandList->SetGraphicsRootSignature(spriteRootSignature_.Get());
 	//PipelineStateを設定
-	graphicsContext->SetPipelineState(spritePipelineStates_[blendMode].Get());
+	commandList->SetPipelineState(spritePipelineStates_[blendMode].Get());
 }
 
 void Renderer::PostDrawSprites() {
@@ -108,12 +124,12 @@ void Renderer::PostDrawSprites() {
 }
 
 void Renderer::PreDrawParticles() {
-	//GraphicsContextのインスタンスを取得
-	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
+	//コマンドリストを取得
+	ID3D12GraphicsCommandList* commandList = graphicsCommon_->GetCommandList();
 	//RootSignatureを設定
-	graphicsContext->SetRootSignature(particleRootSignature_.Get());
+	commandList->SetGraphicsRootSignature(particleRootSignature_.Get());
 	//PipelineStateを設定
-	graphicsContext->SetPipelineState(particlePipelineStates_[0].Get());
+	commandList->SetPipelineState(particlePipelineStates_[0].Get());
 }
 
 void Renderer::PostDrawParticles() {
@@ -195,7 +211,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> Renderer::CompileShader(const std::wstring& fil
 
 void Renderer::CreateModelPipelineState() {
 	//デバイスを取得
-	ID3D12Device* device = GraphicsDevice::GetInstance()->GetDevice();
+	ID3D12Device* device = graphicsCommon_->GetDevice();
 
 	//PSO
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState[RenderingTypeCount];
@@ -366,7 +382,7 @@ void Renderer::CreateModelPipelineState() {
 
 void Renderer::CreateSpritePipelineState() {
 	//デバイスを取得
-	ID3D12Device* device = GraphicsDevice::GetInstance()->GetDevice();
+	ID3D12Device* device = graphicsCommon_->GetDevice();
 
 	//PSO
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState[kCountOfBlendMode];
@@ -574,7 +590,7 @@ void Renderer::CreateSpritePipelineState() {
 
 void Renderer::CreateParticlePipelineState() {
 	//デバイスを取得
-	ID3D12Device* device = GraphicsDevice::GetInstance()->GetDevice();
+	ID3D12Device* device = graphicsCommon_->GetDevice();
 
 	//PSO
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;

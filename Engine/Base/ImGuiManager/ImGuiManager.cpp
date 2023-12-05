@@ -1,5 +1,4 @@
 #include "ImGuiManager.h"
-#include "Engine/Base/Graphics/GraphicsContext.h"
 
 ImGuiManager* ImGuiManager::GetInstance() {
 	static ImGuiManager instance;
@@ -10,7 +9,7 @@ void ImGuiManager::Initialize() {
 	//ウィンドウズアプリケーションのインスタンスを取得
 	app_ = Application::GetInstance();
 	//DirectXCommonのインスタンスを取得
-	device_ = GraphicsDevice::GetInstance();
+	graphicsCommon_ = GraphicsCommon::GetInstance();
 
 	//SRVDescriptorHeapの作成
 	srvDescriptorHeap_ = std::make_unique<SRVHeap>();
@@ -21,7 +20,7 @@ void ImGuiManager::Initialize() {
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(app_->GetHwnd());
-	ImGui_ImplDX12_Init(device_->GetDevice(),
+	ImGui_ImplDX12_Init(graphicsCommon_->GetDevice(),
 		2,
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
 		srvDescriptorHeap_->GetDescriptorHeap(),
@@ -43,14 +42,14 @@ void ImGuiManager::End() {
 
 void ImGuiManager::Draw() {
 	//コマンドリストを取得
-	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
+	ID3D12GraphicsCommandList* commandList = graphicsCommon_->GetCommandList();
 
 	//描画用のDescriptorHeapの設定
 	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_->GetDescriptorHeap() };
-	graphicsContext->SetDescriptorHeaps(1, descriptorHeaps);
+	commandList->SetDescriptorHeaps(1, descriptorHeaps);
 
 	//実際にcommandListのImGuiの描画コマンドを積む
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), graphicsContext->GetCommandList());
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 }
 
 void ImGuiManager::ShutDown() {

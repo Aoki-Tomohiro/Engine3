@@ -1,8 +1,9 @@
 #include "TextureResource.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 
 void TextureResource::Create(const DirectX::TexMetadata& metadata) {
 	//デバイスの取得
-	device_ = GraphicsDevice::GetInstance()->GetDevice();
+	device_ = GraphicsCommon::GetInstance()->GetDevice();
 
 	//リソースの状態の初期化
 	resourceState_ = D3D12_RESOURCE_STATE_COPY_DEST;

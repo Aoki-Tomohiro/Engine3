@@ -1,10 +1,11 @@
 #include "RTVHeap.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 
 uint32_t RTVHeap::descriptorSizeRTV = 0;
 
 void RTVHeap::Create(UINT numDescriptors) {
 	//デバイスを取得
-	device_ = GraphicsDevice::GetInstance()->GetDevice();
+	device_ = GraphicsCommon::GetInstance()->GetDevice();
 
 	//インクリメントサイズの初期化
 	descriptorSizeRTV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);

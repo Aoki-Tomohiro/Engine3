@@ -1,8 +1,9 @@
 #include "ColorBuffer.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 
 void ColorBuffer::Create(int32_t width, int32_t height, DXGI_FORMAT format, float* clearColor) {
 	//デバイスを取得
-	device_ = GraphicsDevice::GetInstance()->GetDevice();
+	device_ = GraphicsCommon::GetInstance()->GetDevice();
 
 	//クリアカラーの初期化
 	clearColor_[0] = clearColor[0];

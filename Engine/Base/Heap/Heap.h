@@ -1,5 +1,6 @@
 #pragma once
-#include "Engine/Base/Graphics/GraphicsDevice.h"
+#include <d3d12.h>
+#include <wrl.h>
 #include <cstdint>
 
 class Heap {

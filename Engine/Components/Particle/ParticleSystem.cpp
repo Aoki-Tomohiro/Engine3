@@ -1,12 +1,14 @@
 #include "ParticleSystem.h"
-#include "Engine/Base/Graphics/GraphicsContext.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 
 //実体定義
 ParticleSystem* ParticleSystem::instance_ = nullptr;
+ID3D12GraphicsCommandList* ParticleSystem::sCommandList_ = nullptr;
 
 void ParticleSystem::StaticInitialize() {
-
+	//コマンドリストの取得
+	sCommandList_ = GraphicsCommon::GetInstance()->GetCommandList();
 }
 
 void ParticleSystem::Initialize() {
@@ -62,24 +64,22 @@ void ParticleSystem::Draw(const Camera& camera) {
 	//InstancingResourceの更新
 	UpdateInstancingResource(camera);
 
-	//GraphicsContextのインスタンスを取得
-	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
 	//DescriptorHeapを設定
 	TextureManager::GetInstance()->SetGraphicsDescriptorHeap();
 	//VBVを設定
-	graphicsContext->SetVertexBuffer(vertexBufferView_);
+	sCommandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
 	//形状を設定。PSOに設定しているものとは別。同じものを設定すると考えておけば良い
-	graphicsContext->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	sCommandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	//マテリアルCBufferの場所を設定
-	graphicsContext->SetConstantBuffer(0, materialResource_->GetGPUVirtualAddress());
+	sCommandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//WorldTransform用のCBufferの場所を設定
-	graphicsContext->SetDescriptorTable(1, srvHandleGpu_);
+	sCommandList_->SetGraphicsRootDescriptorTable(1, srvHandleGpu_);
 	//ViewProjection用のCBufferの場所を設定
-	graphicsContext->SetConstantBuffer(2, camera.GetConstantBuffer()->GetGPUVirtualAddress());
+	sCommandList_->SetGraphicsRootConstantBufferView(2, camera.GetConstantBuffer()->GetGPUVirtualAddress());
 	//DescriptorTableを設定
 	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(3, textureHandle_);
 	//描画!(DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-	graphicsContext->DrawInstanced(UINT(vertices_.size()), numInstance_);
+	sCommandList_->DrawInstanced(UINT(vertices_.size()), numInstance_, 0, 0);
 }
 
 void ParticleSystem::CreateVertexBuffer() {

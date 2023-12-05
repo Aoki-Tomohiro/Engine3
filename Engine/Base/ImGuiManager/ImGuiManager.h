@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Base/Windows/Application.h"
-#include "Engine/Base/Graphics/GraphicsDevice.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 #include "Engine/Base/Heap/SRVHeap.h"
 #include "Engine/Externals/imgui/imgui.h"
 #include "Engine/Externals/imgui/imgui_impl_dx12.h"
@@ -49,7 +49,7 @@ private:
 	//ウィンドウズアプリケーション
 	Application* app_ = nullptr;
 	//DirectXCommon
-	GraphicsDevice* device_ = nullptr;
+	GraphicsCommon* graphicsCommon_ = nullptr;
 	//SRV用ヒープ
 	std::unique_ptr<SRVHeap> srvDescriptorHeap_ = nullptr;
 };

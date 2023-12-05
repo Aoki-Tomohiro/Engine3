@@ -1,8 +1,9 @@
 #include "UploadBuffer.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 
 void UploadBuffer::Create(size_t sizeInBytes) {
 	//デバイスを取得
-	device_ = GraphicsDevice::GetInstance()->GetDevice();
+	device_ = GraphicsCommon::GetInstance()->GetDevice();
 
 	//バッファのサイズの設定
 	bufferSize_ = sizeInBytes;

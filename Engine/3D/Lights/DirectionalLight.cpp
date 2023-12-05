@@ -1,5 +1,4 @@
 #include "DirectionalLight.h"
-#include "Engine/Base/Graphics/GraphicsContext.h"
 
 void DirectionalLight::Initialize() {
 	//lightingResourceの作成
@@ -28,8 +27,8 @@ void DirectionalLight::Update() {
 }
 
 void DirectionalLight::SetGraphicsCommand(UINT rootParameterIndex) {
-	//GraphicsContextのインスタンスを取得
-	GraphicsContext* graphicsContext = GraphicsContext::GetInstance();
+	//コマンドリストを取得
+	ID3D12GraphicsCommandList* commandList = GraphicsCommon::GetInstance()->GetCommandList();
 	//lightingResourceの場所を設定
-	graphicsContext->SetConstantBuffer(rootParameterIndex, lightingResource_->GetGPUVirtualAddress());
+	commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, lightingResource_->GetGPUVirtualAddress());
 }

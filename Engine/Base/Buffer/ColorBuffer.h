@@ -1,5 +1,6 @@
 #pragma once
 #include "GpuResource.h"
+#include <dxgi1_6.h>
 
 class ColorBuffer : public GpuResource {
 public:

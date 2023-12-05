@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Base/Buffer/UploadBuffer.h"
 #include "Engine/Math/MathFunction.h"
+#include <memory>
 
 struct ConstBuffDataWorldTransform {
 	Matrix4x4 world;

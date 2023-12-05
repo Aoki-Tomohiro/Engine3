@@ -345,12 +345,6 @@
     <ClCompile Include="Engine\Base\Graphics\GraphicsCommon.cpp">
       <Filter>ソース ファイル\Engine\Base\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Base\Graphics\GraphicsDevice.cpp">
-      <Filter>ソース ファイル\Engine\Base\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Base\Graphics\GraphicsContext.cpp">
-      <Filter>ソース ファイル\Engine\Base\Graphics</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Project\Scene\GameScene.h">
@@ -528,12 +522,6 @@
       <Filter>ヘッダー ファイル\Engine\Base\Heap</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Base\Graphics\GraphicsCommon.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Graphics\GraphicsDevice.h">
-      <Filter>ヘッダー ファイル\Engine\Base\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Base\Graphics\GraphicsContext.h">
       <Filter>ヘッダー ファイル\Engine\Base\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

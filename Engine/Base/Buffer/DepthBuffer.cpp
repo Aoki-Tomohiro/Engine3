@@ -1,8 +1,9 @@
 #include "DepthBuffer.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 
 void DepthBuffer::Create(int32_t width, int32_t height, DXGI_FORMAT format) {
 	//デバイスを取得
-	device_ = GraphicsDevice::GetInstance()->GetDevice();
+	device_ = GraphicsCommon::GetInstance()->GetDevice();
 
 	//リソースの状態
 	resourceState_ = D3D12_RESOURCE_STATE_DEPTH_WRITE;

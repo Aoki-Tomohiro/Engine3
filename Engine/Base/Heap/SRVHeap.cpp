@@ -1,10 +1,11 @@
 #include "SRVHeap.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 
 uint32_t SRVHeap::descriptorSizeSRV = 0;
 
 void SRVHeap::Create(UINT numDescriptors) {
 	//デバイスを取得
-	device_ = GraphicsDevice::GetInstance()->GetDevice();
+	device_ = GraphicsCommon::GetInstance()->GetDevice();
 
 	//インクリメントサイズの初期化
 	descriptorSizeSRV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);

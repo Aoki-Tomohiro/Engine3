@@ -105,6 +105,10 @@ private:
 private:
 	//インスタンス
 	static TextureManager* instance;
+	//デバイス
+	ID3D12Device* device_ = nullptr;
+	//コマンドリスト
+	ID3D12GraphicsCommandList* commandList_ = nullptr;
 	//ディスクリプタヒープ
 	std::unique_ptr<SRVHeap> srvDescriptorHeap_ = nullptr;
 	//テクスチャの配列

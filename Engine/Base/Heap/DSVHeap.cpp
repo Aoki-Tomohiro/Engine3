@@ -1,10 +1,11 @@
 #include "DSVHeap.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 
 uint32_t DSVHeap::descriptorSizeDSV = 0;
 
 void DSVHeap::Create(UINT numDescriptors) {
 	//デバイスを取得
-	device_ = GraphicsDevice::GetInstance()->GetDevice();
+	device_ = GraphicsCommon::GetInstance()->GetDevice();
 
 	//インクリメントサイズの初期化
 	descriptorSizeDSV = device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);

@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Base/Graphics/GraphicsCommon.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 #include "Engine/Math/MathFunction.h"
 
@@ -251,6 +252,10 @@ private:
 	void AdjustTextureSize();
 
 private:
+	//デバイス
+	static ID3D12Device* sDevice_;
+	//コマンドリスト
+	static ID3D12GraphicsCommandList* sCommandList_;
 	//射影行列
 	static Matrix4x4 sMatProjection_;
 	//頂点バッファ
@@ -263,7 +268,7 @@ private:
 	std::unique_ptr<UploadBuffer> wvpResource_ = nullptr;
 	Matrix4x4* wvpData_ = nullptr;
 	//頂点データ
-	std::array<VertexData,kMaxVertices> vertices_{};
+	std::array<VertexData, kMaxVertices> vertices_{};
 	//頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 	//テクスチャの情報

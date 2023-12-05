@@ -1,7 +1,6 @@
 #pragma once
-#include "Engine/Base/Heap/RTVHeap.h"
-#include "Engine/Base/Heap/SRVHeap.h"
-#include "Engine/Base/Heap/DSVHeap.h"
+#include "Engine/Base/Graphics/GraphicsCommon.h"
+#include "Engine/Base/TextureManager/TextureManager.h"
 #include <vector>
 #include <dxcapi.h>
 #pragma comment(lib,"dxcompiler.lib")
@@ -130,10 +129,12 @@ private:
 	/// パーティクル用のPSOを作成
 	/// </summary>
 	void CreateParticlePipelineState();
-	
+
 private:
 	//インスタンス
 	static Renderer* instance_;
+	//GraphicsCommon
+	GraphicsCommon* graphicsCommon_ = nullptr;
 	//DXC
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_ = nullptr;
 	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_ = nullptr;
@@ -154,4 +155,3 @@ private:
 	std::unique_ptr<SRVHeap> srvHeap_ = nullptr;
 	std::unique_ptr<DSVHeap> dsvHeap_ = nullptr;
 };
-
