@@ -42,8 +42,9 @@ void Renderer::Initialize() {
 	//DSVの作成
 	dsvHeap_->CreateDepthStencilView(*sceneDepthBuffer_, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
-	//DXCの初期化
-	InitializeDXC();
+	//シェーダーコンパイラーの初期化
+	shaderCompiler_ = std::make_unique<ShaderCompiler>();
+	shaderCompiler_->Initialize();
 
 	//モデル用のPSOの作成
 	CreateModelPipelineState();
@@ -101,9 +102,9 @@ void Renderer::PreDrawModels(ModelRenderingType type) {
 	//コマンドリストを取得
 	ID3D12GraphicsCommandList* commandList = graphicsCommon_->GetCommandList();
 	//RootSignatureを設定
-	commandList->SetGraphicsRootSignature(modelRootSignature_.Get());
+	commandList->SetGraphicsRootSignature(modelRootSignature_->GetRootSignature());
 	//PipelineStateを設定
-	commandList->SetPipelineState(modelPipelineStates_[type].Get());
+	commandList->SetPipelineState(modelPipelineStates_[type]->GetPipelineState());
 }
 
 void Renderer::PostDrawModels() {
@@ -114,9 +115,9 @@ void Renderer::PreDrawSprites(BlendMode blendMode) {
 	//コマンドリストを取得
 	ID3D12GraphicsCommandList* commandList = graphicsCommon_->GetCommandList();
 	//RootSignatureを設定
-	commandList->SetGraphicsRootSignature(spriteRootSignature_.Get());
+	commandList->SetGraphicsRootSignature(spriteRootSignature_->GetRootSignature());
 	//PipelineStateを設定
-	commandList->SetPipelineState(spritePipelineStates_[blendMode].Get());
+	commandList->SetPipelineState(spritePipelineStates_[blendMode]->GetPipelineState());
 }
 
 void Renderer::PostDrawSprites() {
@@ -127,98 +128,18 @@ void Renderer::PreDrawParticles() {
 	//コマンドリストを取得
 	ID3D12GraphicsCommandList* commandList = graphicsCommon_->GetCommandList();
 	//RootSignatureを設定
-	commandList->SetGraphicsRootSignature(particleRootSignature_.Get());
+	commandList->SetGraphicsRootSignature(particleRootSignature_->GetRootSignature());
 	//PipelineStateを設定
-	commandList->SetPipelineState(particlePipelineStates_[0].Get());
+	commandList->SetPipelineState(particlePipelineStates_[0]->GetPipelineState());
 }
 
 void Renderer::PostDrawParticles() {
 
 }
 
-void Renderer::InitializeDXC() {
-	//dxccompilerを初期化
-	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
-	assert(SUCCEEDED(hr));
-
-	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
-	assert(SUCCEEDED(hr));
-
-	//現時点ではincludeはしないが、includeに対応するための設定を行っておく
-	hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
-	assert(SUCCEEDED(hr));
-}
-
-Microsoft::WRL::ComPtr<IDxcBlob> Renderer::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
-	//これからシェーダーをコンパイルする旨をログに出す
-	Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
-	//hlslファイルを読む
-	IDxcBlobEncoding* shaderSource = nullptr;
-	HRESULT hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
-	//読めなかったら止める
-	assert(SUCCEEDED(hr));
-	//読み込んだファイルの内容を設定する
-	DxcBuffer shaderSourceBuffer{};
-	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
-	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
-	shaderSourceBuffer.Encoding = DXC_CP_UTF8;//UTF8の文字コードであることを通知
-
-
-	LPCWSTR arguments[] = {
-		filePath.c_str(),//コンパイル対象のhlslファイル名
-		L"-E",L"main",//エントリーポイントの指定。基本的にmain以外にはしない
-		L"-T",profile,//ShaderProfileの設定
-		L"-Zi",L"-Qembed_debug",//デバッグ用の情報を埋め込む
-		L"-Od",//最適化を外しておく
-		L"-Zpr",//メモリレイアウトは行優先
-	};
-	//実際にShaderをコンパイルする
-	IDxcResult* shaderResult = nullptr;
-	hr = dxcCompiler_->Compile(
-		&shaderSourceBuffer,//読み込んだファイル
-		arguments,//コンパイルオプション
-		_countof(arguments),//コンパイルオプションの数
-		includeHandler_.Get(),//includeが含まれた諸々
-		IID_PPV_ARGS(&shaderResult)//コンパイル結果
-	);
-	//コンパイルエラーではなくdxcが起動できないほど致命的な状況
-	assert(SUCCEEDED(hr));
-
-
-	//警告・エラーが出てたらログに出して止める
-	IDxcBlobUtf8* shaderError = nullptr;
-	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), _In_opt_ nullptr);
-	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
-		Log(shaderError->GetStringPointer());
-		//警告・エラーダメゼッタイ
-		assert(false);
-	}
-
-
-	//コンパイル結果から実行用のバイナリ部分を取得
-	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
-	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
-	assert(SUCCEEDED(hr));
-	//成功したログを出す
-	Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", filePath, profile)));
-	//もう使わないリソースを解放
-	shaderSource->Release();
-	shaderResult->Release();
-
-	//実行用のバイナリを返却
-	return shaderBlob;
-}
-
 void Renderer::CreateModelPipelineState() {
-	//デバイスを取得
-	ID3D12Device* device = graphicsCommon_->GetDevice();
-
-	//PSO
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState[RenderingTypeCount];
-
-	//RootSignature作成
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	//生成
+	modelRootSignature_ = std::make_unique<RootSignature>();
 
 	//DescriptorRange作成
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
@@ -232,21 +153,24 @@ void Renderer::CreateModelPipelineState() {
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVで使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号0とバインド
+	modelRootSignature_->AddRootParameter(rootParameters[0]);
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//VertexShaderで使う
 	rootParameters[1].Descriptor.ShaderRegister = 0;//レジスタ番号0を使う
+	modelRootSignature_->AddRootParameter(rootParameters[1]);
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//VertexShaderで使う
 	rootParameters[2].Descriptor.ShaderRegister = 1;//レジスタ番号1を使う
+	modelRootSignature_->AddRootParameter(rootParameters[2]);
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableを使う
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[3].DescriptorTable.pDescriptorRanges = descriptorRange;//Tableの中身の配列を指定
 	rootParameters[3].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//Tableで利用する数
+	modelRootSignature_->AddRootParameter(rootParameters[3]);
 	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[4].Descriptor.ShaderRegister = 1;//レジスタ番号１を使う
-	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
-	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
+	modelRootSignature_->AddRootParameter(rootParameters[4]);
 
 	//Sampler作成
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
@@ -258,26 +182,12 @@ void Renderer::CreateModelPipelineState() {
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//ありったけのMipmapを使う
 	staticSamplers[0].ShaderRegister = 0;//レジスタ番号0を使う
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
-	descriptionRootSignature.pStaticSamplers = staticSamplers;
-	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
-	//シリアライズしてバイナリにする
-	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
-		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
-		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		assert(false);
-	}
+	modelRootSignature_->AddStaticSampler(staticSamplers[0]);
 	//バイナリを元に生成
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&modelRootSignature_));
-	assert(SUCCEEDED(hr));
-
+	modelRootSignature_->Finalize();
 
 	//InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[3]{};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -290,15 +200,31 @@ void Renderer::CreateModelPipelineState() {
 	inputElementDescs[2].SemanticIndex = 0;
 	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
+
+
+	//Shaderをコンパイルする
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = shaderCompiler_->CompileShader(L"Resources/Shader/Object3d.VS.hlsl", L"vs_6_0");
+	assert(vertexShaderBlob != nullptr);
+
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = shaderCompiler_->CompileShader(L"Resources/Shader/Object3d.PS.hlsl", L"ps_6_0");
+	assert(pixelShaderBlob != nullptr);
 
 
 	//BlendStateの設定
-	D3D12_BLEND_DESC blendDesc{};
+	D3D12_BLEND_DESC blendDesc[2]{};
 	//すべての色要素を書き込む
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc[0].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	//透明オブジェクトのBlendStateの設定
+	blendDesc[1].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	//共通設定
+	blendDesc[1].RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
+	blendDesc[1].RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[1].RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
+	blendDesc[1].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
+	//半透明合成
+	blendDesc[1].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[1].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースのアルファ値
+	blendDesc[1].RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//1.0f-ソースのアルファ値
 
 
 	//RasterizerStateの設定
@@ -307,14 +233,6 @@ void Renderer::CreateModelPipelineState() {
 	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
 	//三角形の中を塗りつぶす
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-
-
-	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"Resources/Shader/Object3d.VS.hlsl", L"vs_6_0");
-	assert(vertexShaderBlob != nullptr);
-
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"Resources/Shader/Object3d.PS.hlsl", L"ps_6_0");
-	assert(pixelShaderBlob != nullptr);
 
 
 	//DepthStencilStateの設定
@@ -327,69 +245,33 @@ void Renderer::CreateModelPipelineState() {
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 
-	//PSOを作成する
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = modelRootSignature_.Get();//RootSignature
-	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
-	graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),
-	vertexShaderBlob->GetBufferSize() };//VertexShader
-	graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),
-	pixelShaderBlob->GetBufferSize() };//PixelShader
-	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
-	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
 	//書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = 2;
-	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	graphicsPipelineStateDesc.RTVFormats[1] = DXGI_FORMAT_R32_FLOAT;
-	//利用するトポロジ(形状)のタイプ。三角形
-	graphicsPipelineStateDesc.PrimitiveTopologyType =
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	//どのように画面に色を打ち込むかの設定(気にしなくて良い)
-	graphicsPipelineStateDesc.SampleDesc.Count = 1;
-	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	//DepthStencilの設定
-	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	//実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState[Opaque]));
-	assert(SUCCEEDED(hr));
-	//配列に追加
-	modelPipelineStates_.push_back(pipelineState[Opaque]);
+	DXGI_FORMAT rtvFormats[2]{};
+	rtvFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	rtvFormats[1] = DXGI_FORMAT_R32_FLOAT;
 
 
-
-	//透明オブジェクトのBlendStateの設定
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-	//共通設定
-	blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
-	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
-	//半透明合成
-	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
-	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースのアルファ値
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//1.0f-ソースのアルファ値
-
-	//PSOに再設定
-	graphicsPipelineStateDesc.BlendState = blendDesc;
-
-	//生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState[Transparent]));
-	assert(SUCCEEDED(hr));
-	//配列に追加
-	modelPipelineStates_.push_back(pipelineState[Transparent]);
+	//PSOを作成する
+	for (uint32_t i = 0; i < RenderingTypeCount; i++) {
+		modelPipelineStates_.push_back(std::make_unique<PipelineState>());
+		modelPipelineStates_[i]->SetRootSignature(modelRootSignature_.get());
+		modelPipelineStates_[i]->SetInputLayout(3, inputElementDescs);
+		modelPipelineStates_[i]->SetVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize());
+		modelPipelineStates_[i]->SetPixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize());
+		modelPipelineStates_[i]->SetBlendState(blendDesc[i]);
+		modelPipelineStates_[i]->SetRasterizerState(rasterizerDesc);
+		modelPipelineStates_[i]->SetRenderTargetFormat(2, rtvFormats);
+		modelPipelineStates_[i]->SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+		modelPipelineStates_[i]->SetSampleDesc(1);
+		modelPipelineStates_[i]->SetDepthStencilState(depthStencilDesc);
+		modelPipelineStates_[i]->SetDepthStencilFormat(DXGI_FORMAT_D24_UNORM_S8_UINT);
+		modelPipelineStates_[i]->Finalize();
+	}
 }
 
 void Renderer::CreateSpritePipelineState() {
-	//デバイスを取得
-	ID3D12Device* device = graphicsCommon_->GetDevice();
-
-	//PSO
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState[kCountOfBlendMode];
-
-	//RootSignature作成
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	//生成
+	spriteRootSignature_ = std::make_unique<RootSignature>();
 
 	//DescriptorRange作成
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
@@ -403,15 +285,16 @@ void Renderer::CreateSpritePipelineState() {
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVで使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号0とバインド
+	spriteRootSignature_->AddRootParameter(rootParameters[0]);
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//VertexShaderで使う
 	rootParameters[1].Descriptor.ShaderRegister = 0;//レジスタ番号0を使う
+	spriteRootSignature_->AddRootParameter(rootParameters[1]);
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableを使う
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;//Tableの中身の配列を指定
 	rootParameters[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//Tableで利用する数
-	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
-	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
+	spriteRootSignature_->AddRootParameter(rootParameters[2]);
 
 	//Sampler作成
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
@@ -423,22 +306,9 @@ void Renderer::CreateSpritePipelineState() {
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//ありったけのMipmapを使う
 	staticSamplers[0].ShaderRegister = 0;//レジスタ番号0を使う
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
-	descriptionRootSignature.pStaticSamplers = staticSamplers;
-	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
-	//シリアライズしてバイナリにする
-	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
-		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
-		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		assert(false);
-	}
+	spriteRootSignature_->AddStaticSampler(staticSamplers[0]);
 	//バイナリを元に生成
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&spriteRootSignature_));
-	assert(SUCCEEDED(hr));
+	spriteRootSignature_->Finalize();
 
 
 	//InputLayout
@@ -451,15 +321,62 @@ void Renderer::CreateSpritePipelineState() {
 	inputElementDescs[1].SemanticIndex = 0;
 	inputElementDescs[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	inputElementDescs[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
 
 	//BlendStateの設定
-	D3D12_BLEND_DESC blendDesc{};
-	//すべての色要素を書き込む
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	D3D12_BLEND_DESC blendDesc[6]{};
+	//ブレンドなし
+	blendDesc[0].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+	//半透明合成
+	blendDesc[1].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc[1].RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
+	blendDesc[1].RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[1].RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
+	blendDesc[1].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
+	blendDesc[1].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[1].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースのアルファ値
+	blendDesc[1].RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//1.0f-ソースのアルファ値
+
+	//加算合成
+	blendDesc[2].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc[2].RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
+	blendDesc[2].RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[2].RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
+	blendDesc[2].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
+	blendDesc[2].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[2].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの値を100%使う
+	blendDesc[2].RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの値を100%使う
+
+	//減算合成
+	blendDesc[3].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc[3].RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
+	blendDesc[3].RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[3].RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
+	blendDesc[3].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
+	blendDesc[3].RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;//減算
+	blendDesc[3].RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの値を100%使う
+	blendDesc[3].RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの値を100%使う
+
+	//乗算合成
+	blendDesc[4].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc[4].RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
+	blendDesc[4].RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[4].RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
+	blendDesc[4].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
+	blendDesc[4].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[4].RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;//ソースの値を0%使う
+	blendDesc[4].RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;//デストの色を使う
+
+	//スクリーン合成
+	blendDesc[5].RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc[5].RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
+	blendDesc[5].RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[5].RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
+	blendDesc[5].RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
+	blendDesc[5].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+	blendDesc[5].RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;//1-ソースの色を使う
+	blendDesc[5].RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの色を100%使う
 
 
 	//RasterizerStateの設定
@@ -472,10 +389,10 @@ void Renderer::CreateSpritePipelineState() {
 
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"Resources/Shader/SpriteVS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = shaderCompiler_->CompileShader(L"Resources/Shader/SpriteVS.hlsl", L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"Resources/Shader/SpritePS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = shaderCompiler_->CompileShader(L"Resources/Shader/SpritePS.hlsl", L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
 
 
@@ -489,115 +406,32 @@ void Renderer::CreateSpritePipelineState() {
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 
-	//PSOを作成する
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = spriteRootSignature_.Get();//RootSignature
-	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
-	graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),
-	vertexShaderBlob->GetBufferSize() };//VertexShader
-	graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),
-	pixelShaderBlob->GetBufferSize() };//PixelShader
-	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
-	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
 	//書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = 1;
-	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	//利用するトポロジ(形状)のタイプ。三角形
-	graphicsPipelineStateDesc.PrimitiveTopologyType =
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	//どのように画面に色を打ち込むかの設定(気にしなくて良い)
-	graphicsPipelineStateDesc.SampleDesc.Count = 1;
-	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	//DepthStencilの設定
-	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	//実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState[kBlendModeNone]));
-	assert(SUCCEEDED(hr));
-	//配列に追加
-	spritePipelineStates_.push_back(pipelineState[kBlendModeNone]);
+	DXGI_FORMAT rtvFormats[1]{};
+	rtvFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
 
-	//共通設定
-	blendDesc.RenderTarget[0].BlendEnable = true;//ブレンドを有効にする
-	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
-	//半透明合成
-	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
-	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースのアルファ値
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//1.0f-ソースのアルファ値
-	//BlendModeを再設定
-	graphicsPipelineStateDesc.BlendState = blendDesc;
-	//実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState[kBlendModeNormal]));
-	assert(SUCCEEDED(hr));
-	//配列に追加
-	spritePipelineStates_.push_back(pipelineState[kBlendModeNormal]);
-
-
-	//加算合成
-	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
-	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの値を100%使う
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの値を100%使う
-	//BlendModeを再設定
-	graphicsPipelineStateDesc.BlendState = blendDesc;
-	//実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState[kBlendModeAdd]));
-	assert(SUCCEEDED(hr));
-	//配列に追加
-	spritePipelineStates_.push_back(pipelineState[kBlendModeAdd]);
-
-
-	//減算合成
-	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;//減算
-	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの値を100%使う
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの値を100%使う
-	//BlendModeを再設定
-	graphicsPipelineStateDesc.BlendState = blendDesc;
-	//実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState[kBlendModeSubtract]));
-	assert(SUCCEEDED(hr));
-	//配列に追加
-	spritePipelineStates_.push_back(pipelineState[kBlendModeSubtract]);
-
-
-	//乗算合成
-	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
-	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;//ソースの値を0%使う
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;//デストの色を使う
-	//BlendModeを再設定
-	graphicsPipelineStateDesc.BlendState = blendDesc;
-	//実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState[kBlendModeMultiply]));
-	assert(SUCCEEDED(hr));
-	//配列に追加
-	spritePipelineStates_.push_back(pipelineState[kBlendModeMultiply]);
-
-
-	//スクリーン合成
-	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
-	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;//1-ソースの色を使う
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの色を100%使う
-	//BlendModeを再設定
-	graphicsPipelineStateDesc.BlendState = blendDesc;
-	//実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState[kBlendModeScreen]));
-	assert(SUCCEEDED(hr));
-	//配列に追加
-	spritePipelineStates_.push_back(pipelineState[kBlendModeScreen]);
+	//PSOを作成する
+	for (uint32_t i = 0; i < kCountOfBlendMode; i++) {
+		spritePipelineStates_.push_back(std::make_unique<PipelineState>());
+		spritePipelineStates_[i]->SetRootSignature(spriteRootSignature_.get());
+		spritePipelineStates_[i]->SetInputLayout(2, inputElementDescs);
+		spritePipelineStates_[i]->SetVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize());
+		spritePipelineStates_[i]->SetPixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize());
+		spritePipelineStates_[i]->SetBlendState(blendDesc[i]);
+		spritePipelineStates_[i]->SetRasterizerState(rasterizerDesc);
+		spritePipelineStates_[i]->SetRenderTargetFormat(1, rtvFormats);
+		spritePipelineStates_[i]->SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+		spritePipelineStates_[i]->SetSampleDesc(1);
+		spritePipelineStates_[i]->SetDepthStencilState(depthStencilDesc);
+		spritePipelineStates_[i]->SetDepthStencilFormat(DXGI_FORMAT_D24_UNORM_S8_UINT);
+		spritePipelineStates_[i]->Finalize();
+	}
 }
 
 void Renderer::CreateParticlePipelineState() {
-	//デバイスを取得
-	ID3D12Device* device = graphicsCommon_->GetDevice();
-
-	//PSO
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState = nullptr;
-
-	//RootSignature作成
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
-	descriptionRootSignature.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+	//生成
+	particleRootSignature_ = std::make_unique<RootSignature>();
 
 	//DescriptorRange作成
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
@@ -617,19 +451,21 @@ void Renderer::CreateParticlePipelineState() {
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVで使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;//レジスタ番号0とバインド
+	particleRootSignature_->AddRootParameter(rootParameters[0]);
 	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableを使う
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//VertexShaderで使う
 	rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;//Tableの中身の配列を指定
 	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);//Tableで利用する数
+	particleRootSignature_->AddRootParameter(rootParameters[1]);
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//CBVを使う
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;//VertexShaderで使う
 	rootParameters[2].Descriptor.ShaderRegister = 1;//レジスタ番号1を使う
+	particleRootSignature_->AddRootParameter(rootParameters[2]);
 	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;//DescriptorTableを使う
 	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
 	rootParameters[3].DescriptorTable.pDescriptorRanges = descriptorRange;//Tableの中身の配列を指定
 	rootParameters[3].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);//Tableで利用する数
-	descriptionRootSignature.pParameters = rootParameters;//ルートパラメータ配列へのポインタ
-	descriptionRootSignature.NumParameters = _countof(rootParameters);//配列の長さ
+	particleRootSignature_->AddRootParameter(rootParameters[3]);
 
 	//Sampler作成
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
@@ -641,22 +477,9 @@ void Renderer::CreateParticlePipelineState() {
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;//ありったけのMipmapを使う
 	staticSamplers[0].ShaderRegister = 0;//レジスタ番号0を使う
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//PixelShaderで使う
-	descriptionRootSignature.pStaticSamplers = staticSamplers;
-	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
-
-	//シリアライズしてバイナリにする
-	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
-	HRESULT hr = D3D12SerializeRootSignature(&descriptionRootSignature,
-		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
-	if (FAILED(hr)) {
-		Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
-		assert(false);
-	}
+	particleRootSignature_->AddStaticSampler(staticSamplers[0]);
 	//バイナリを元に生成
-	hr = device->CreateRootSignature(0, signatureBlob->GetBufferPointer(),
-		signatureBlob->GetBufferSize(), IID_PPV_ARGS(&particleRootSignature_));
-	assert(SUCCEEDED(hr));
+	particleRootSignature_->Finalize();
 
 
 	//InputLayout
@@ -673,9 +496,6 @@ void Renderer::CreateParticlePipelineState() {
 	inputElementDescs[2].SemanticIndex = 0;
 	inputElementDescs[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	inputElementDescs[2].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
-	inputLayoutDesc.pInputElementDescs = inputElementDescs;
-	inputLayoutDesc.NumElements = _countof(inputElementDescs);
 
 
 	//BlendStateの設定
@@ -687,14 +507,14 @@ void Renderer::CreateParticlePipelineState() {
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;//加算
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;//ソースの値を100%使う
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;//デストの値を0%使う
-	////半透明合成
-	//blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
-	//blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースのアルファ値
-	//blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//1.0f-ソースのアルファ値
 	//加算合成
 	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
 	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースの値を100%使う
 	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;//デストの値を100%使う
+	////半透明合成
+	//blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;//加算
+	//blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;//ソースのアルファ値
+	//blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;//1.0f-ソースのアルファ値
 
 
 	//RasterizerStateの設定
@@ -706,50 +526,41 @@ void Renderer::CreateParticlePipelineState() {
 
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"Resources/Shader/Particle.VS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = shaderCompiler_->CompileShader(L"Resources/Shader/Particle.VS.hlsl", L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"Resources/Shader/Particle.PS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = shaderCompiler_->CompileShader(L"Resources/Shader/Particle.PS.hlsl", L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
 
 
 	//DepthStencilStateの設定
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
-	//Depthの機能を有効化する
-	//depthStencilDesc.DepthEnable = true;
+	//Depthの機能を無効化する
 	depthStencilDesc.DepthEnable = false;
-	//書き込みします
+	//書き込みしない
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	//比較関数はLessEqual。つまり、近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 
-	//PSOを作成する
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = particleRootSignature_.Get();//RootSignature
-	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
-	graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),
-	vertexShaderBlob->GetBufferSize() };//VertexShader
-	graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),
-	pixelShaderBlob->GetBufferSize() };//PixelShader
-	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
-	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
 	//書き込むRTVの情報
-	graphicsPipelineStateDesc.NumRenderTargets = 2;
-	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	graphicsPipelineStateDesc.RTVFormats[1] = DXGI_FORMAT_R32_FLOAT;
-	//利用するトポロジ(形状)のタイプ。三角形
-	graphicsPipelineStateDesc.PrimitiveTopologyType =
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	//どのように画面に色を打ち込むかの設定(気にしなくて良い)
-	graphicsPipelineStateDesc.SampleDesc.Count = 1;
-	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-	//DepthStencilの設定
-	graphicsPipelineStateDesc.DepthStencilState = depthStencilDesc;
-	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	//実際に生成
-	hr = device->CreateGraphicsPipelineState(&graphicsPipelineStateDesc, IID_PPV_ARGS(&pipelineState));
-	assert(SUCCEEDED(hr));
-	//配列に追加
-	particlePipelineStates_.push_back(pipelineState);
+	DXGI_FORMAT rtvFormats[2]{};
+	rtvFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	rtvFormats[1] = DXGI_FORMAT_R32_FLOAT;
+
+
+	//PSOを作成する
+	particlePipelineStates_.push_back(std::make_unique<PipelineState>());
+	particlePipelineStates_[0]->SetRootSignature(particleRootSignature_.get());
+	particlePipelineStates_[0]->SetInputLayout(3, inputElementDescs);
+	particlePipelineStates_[0]->SetVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize());
+	particlePipelineStates_[0]->SetPixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize());
+	particlePipelineStates_[0]->SetBlendState(blendDesc);
+	particlePipelineStates_[0]->SetRasterizerState(rasterizerDesc);
+	particlePipelineStates_[0]->SetRenderTargetFormat(2, rtvFormats);
+	particlePipelineStates_[0]->SetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+	particlePipelineStates_[0]->SetSampleDesc(1);
+	particlePipelineStates_[0]->SetDepthStencilState(depthStencilDesc);
+	particlePipelineStates_[0]->SetDepthStencilFormat(DXGI_FORMAT_D24_UNORM_S8_UINT);
+	particlePipelineStates_[0]->Finalize();
 }

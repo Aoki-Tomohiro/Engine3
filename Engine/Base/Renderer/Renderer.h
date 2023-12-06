@@ -1,9 +1,9 @@
 #pragma once
 #include "Engine/Base/Graphics/GraphicsCommon.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
+#include "Engine/Base/PipelineState/PipelineState.h"
+#include "Engine/Base/ShaderCompiler/ShaderCompiler.h"
 #include <vector>
-#include <dxcapi.h>
-#pragma comment(lib,"dxcompiler.lib")
 
 class Renderer {
 public:
@@ -101,21 +101,6 @@ private:
 	Renderer& operator=(const Renderer&) = delete;
 
 	/// <summary>
-	/// DXCの初期化
-	/// </summary>
-	void InitializeDXC();
-
-	/// <summary>
-	/// シェーダーコンパイル
-	/// </summary>
-	/// <param name="filePath"></param>
-	/// <param name="profile"></param>
-	/// <returns></returns>
-	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(
-		const std::wstring& filePath,
-		const wchar_t* profile);
-
-	/// <summary>
 	/// モデル用のPSOを作成
 	/// </summary>
 	void CreateModelPipelineState();
@@ -135,18 +120,16 @@ private:
 	static Renderer* instance_;
 	//GraphicsCommon
 	GraphicsCommon* graphicsCommon_ = nullptr;
-	//DXC
-	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_ = nullptr;
-	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_ = nullptr;
-	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_ = nullptr;
+	//シェーダーコンパイラー
+	std::unique_ptr<ShaderCompiler> shaderCompiler_ = nullptr;
 	//ルートシグネチャ
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> modelRootSignature_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> spriteRootSignature_ = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> particleRootSignature_ = nullptr;
+	std::unique_ptr<RootSignature> modelRootSignature_ = nullptr;
+	std::unique_ptr<RootSignature> spriteRootSignature_ = nullptr;
+	std::unique_ptr<RootSignature> particleRootSignature_ = nullptr;
 	//PipelineState
-	std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> modelPipelineStates_{};
-	std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> spritePipelineStates_{};
-	std::vector<Microsoft::WRL::ComPtr<ID3D12PipelineState>> particlePipelineStates_{};
+	std::vector<std::unique_ptr<PipelineState>> modelPipelineStates_{};
+	std::vector<std::unique_ptr<PipelineState>> spritePipelineStates_{};
+	std::vector<std::unique_ptr<PipelineState>> particlePipelineStates_{};
 	//Resource
 	std::unique_ptr<ColorBuffer> sceneColorBuffer_ = nullptr;
 	std::unique_ptr<DepthBuffer> sceneDepthBuffer_ = nullptr;

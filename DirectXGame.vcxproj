@@ -166,7 +166,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Base\Heap\RTVHeap.cpp" />
     <ClCompile Include="Engine\Base\Heap\SRVHeap.cpp" />
     <ClCompile Include="Engine\Base\ImGuiManager\ImGuiManager.cpp" />
+    <ClCompile Include="Engine\Base\PipelineState\PipelineState.cpp" />
     <ClCompile Include="Engine\Base\Renderer\Renderer.cpp" />
+    <ClCompile Include="Engine\Base\RootSignature\RootSignature.cpp" />
+    <ClCompile Include="Engine\Base\ShaderCompiler\ShaderCompiler.cpp" />
     <ClCompile Include="Engine\Base\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\Base\Windows\Application.cpp" />
     <ClCompile Include="Engine\Components\Audio\Audio.cpp" />
@@ -229,7 +232,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Base\Heap\RTVHeap.h" />
     <ClInclude Include="Engine\Base\Heap\SRVHeap.h" />
     <ClInclude Include="Engine\Base\ImGuiManager\ImGuiManager.h" />
+    <ClInclude Include="Engine\Base\PipelineState\PipelineState.h" />
     <ClInclude Include="Engine\Base\Renderer\Renderer.h" />
+    <ClInclude Include="Engine\Base\RootSignature\RootSignature.h" />
+    <ClInclude Include="Engine\Base\ShaderCompiler\ShaderCompiler.h" />
     <ClInclude Include="Engine\Base\TextureManager\TextureManager.h" />
     <ClInclude Include="Engine\Base\Windows\Application.h" />
     <ClInclude Include="Engine\Components\Audio\Audio.h" />

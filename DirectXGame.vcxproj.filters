@@ -202,6 +202,24 @@
     <Filter Include="ヘッダー ファイル\Engine\Base\Graphics">
       <UniqueIdentifier>{33161d57-e932-4c05-bb37-4b4c71bc6ce8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Engine\Base\PipelineState">
+      <UniqueIdentifier>{6321a6d4-67dd-4d67-83d1-bb11d382b622}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Base\PipelineState">
+      <UniqueIdentifier>{138f098c-f67d-4d5f-972c-076c3b2e5b66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Base\RootSignature">
+      <UniqueIdentifier>{d2b56544-c783-4df8-b137-092ab8ed5373}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Base\RootSignature">
+      <UniqueIdentifier>{c29cf210-e29c-45b2-b5f4-9a4e9ed9e54a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Engine\Base\ShaderCompiler">
+      <UniqueIdentifier>{9fa19c6f-2f3d-4942-bdf8-30425c111e54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Base\ShaderCompiler">
+      <UniqueIdentifier>{e62befce-5628-49d7-b758-7e3d71048266}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -344,6 +362,15 @@
     </ClCompile>
     <ClCompile Include="Engine\Base\Graphics\GraphicsCommon.cpp">
       <Filter>ソース ファイル\Engine\Base\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\RootSignature\RootSignature.cpp">
+      <Filter>ソース ファイル\Engine\Base\RootSignature</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\PipelineState\PipelineState.cpp">
+      <Filter>ソース ファイル\Engine\Base\PipelineState</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Base\ShaderCompiler\ShaderCompiler.cpp">
+      <Filter>ソース ファイル\Engine\Base\ShaderCompiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -523,6 +550,15 @@
     </ClInclude>
     <ClInclude Include="Engine\Base\Graphics\GraphicsCommon.h">
       <Filter>ヘッダー ファイル\Engine\Base\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\RootSignature\RootSignature.h">
+      <Filter>ヘッダー ファイル\Engine\Base\RootSignature</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\PipelineState\PipelineState.h">
+      <Filter>ヘッダー ファイル\Engine\Base\PipelineState</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Base\ShaderCompiler\ShaderCompiler.h">
+      <Filter>ヘッダー ファイル\Engine\Base\ShaderCompiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
