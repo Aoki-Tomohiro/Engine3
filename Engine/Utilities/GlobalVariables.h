@@ -67,7 +67,7 @@ public:
 	void AddItem(const std::string& groupName, const std::string& key, const Vector3& value);
 
 public:
-	const std::string kDirectoryPath = "Resources/Config/";
+	const std::string kDirectoryPath = "Project/Resources/Config/";
 
 private:
 	GlobalVariables() = default;

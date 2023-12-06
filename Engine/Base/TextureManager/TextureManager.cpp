@@ -36,7 +36,7 @@ void TextureManager::Initialize() {
 	srvDescriptorHeap_->Create(kNumDescriptors);
 
 	//デフォルト画像を読み込む
-	LoadInternal("Resources/Images/white.png");
+	LoadInternal("Project/Resources/Images/white.png");
 }
 
 void TextureManager::SetGraphicsDescriptorHeap() {

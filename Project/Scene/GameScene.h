@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Framework/Scene/IScene.h"
+#include "Engine/Base/Renderer/Renderer.h"
 
 class GameScene : public IScene {
 public:
@@ -29,6 +30,7 @@ public:
 	void DrawUI() override;
 
 private:
-
+	//Renderer
+	Renderer* renderer_ = nullptr;
 };
 

@@ -567,69 +567,69 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shader\HorizontalBlur.hlsli">
+    <None Include="Project\Resources\Shaders\HorizontalBlur.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Resources\Shader\MultiPass.hlsli">
+    <None Include="Project\Resources\Shaders\MultiPass.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Resources\Shader\Object3d.hlsli">
+    <None Include="Project\Resources\Shaders\Object3d.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Resources\Shader\Particle.hlsli">
+    <None Include="Project\Resources\Shaders\Particle.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Resources\Shader\PostEffects.hlsli">
+    <None Include="Project\Resources\Shaders\PostEffects.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Resources\Shader\Sprite.hlsli">
+    <None Include="Project\Resources\Shaders\Sprite.hlsli">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Resources\Shader\VerticalBlur.hlsli">
+    <None Include="Project\Resources\Shaders\VerticalBlur.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\Shader\HorizontalBlurPS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\HorizontalBlurPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\HorizontalBlurVS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\HorizontalBlurVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\MultiPassPS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\MultiPassPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\MultiPassVS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\MultiPassVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\Object3d.PS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\Object3d.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\Object3d.VS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\Object3d.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\Particle.PS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\Particle.PS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\Particle.VS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\Particle.VS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\PostEffectsPS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\PostEffectsPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\PostEffectsVS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\PostEffectsVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\SpritePS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\SpritePS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\SpriteVS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\SpriteVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\VerticalBlurPS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\VerticalBlurPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shader\VerticalBlurVS.hlsl">
+    <FxCompile Include="Project\Resources\Shaders\VerticalBlurVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

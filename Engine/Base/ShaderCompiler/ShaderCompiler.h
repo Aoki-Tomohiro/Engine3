@@ -6,6 +6,9 @@
 
 class ShaderCompiler {
 public:
+	//ディレクトリパス
+	static const std::wstring& kBaseDirectory;
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
