@@ -2,6 +2,7 @@
 
 //実体定義
 Renderer* Renderer::instance_ = nullptr;
+const std::wstring& Renderer::kBaseDirectory = L"Project/Resources/Shaders/";
 
 Renderer* Renderer::GetInstance() {
 	if (instance_ == nullptr) {
@@ -18,6 +19,9 @@ void Renderer::DeleteInstance() {
 void Renderer::Initialize() {
 	//デバイスの取得
 	graphicsCommon_ = GraphicsCommon::GetInstance();
+
+	//DXCの初期化
+	InitializeDXC();
 
 	//DescriptorHeapの作成
 	ID3D12Device* device = graphicsCommon_->GetDevice();
@@ -41,10 +45,6 @@ void Renderer::Initialize() {
 	srvHeap_->CreateShaderResourceView(*sceneColorBuffer_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 	//DSVの作成
 	dsvHeap_->CreateDepthStencilView(*sceneDepthBuffer_, DXGI_FORMAT_D24_UNORM_S8_UINT);
-
-	//シェーダーコンパイラーの初期化
-	shaderCompiler_ = std::make_unique<ShaderCompiler>();
-	shaderCompiler_->Initialize();
 
 	//モデル用のPSOの作成
 	CreateModelPipelineState();
@@ -137,6 +137,80 @@ void Renderer::PostDrawParticles() {
 
 }
 
+Microsoft::WRL::ComPtr<IDxcBlob> Renderer::CompileShader(const std::wstring& filePath, const wchar_t* profile) {
+	//これからシェーダーをコンパイルする旨をログに出す
+	std::wstring combinedPath = kBaseDirectory + filePath;
+	Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", combinedPath, profile)));
+	//hlslファイルを読む
+	IDxcBlobEncoding* shaderSource = nullptr;
+	HRESULT hr = dxcUtils_->LoadFile(combinedPath.c_str(), nullptr, &shaderSource);
+	//読めなかったら止める
+	assert(SUCCEEDED(hr));
+	//読み込んだファイルの内容を設定する
+	DxcBuffer shaderSourceBuffer{};
+	shaderSourceBuffer.Ptr = shaderSource->GetBufferPointer();
+	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
+	shaderSourceBuffer.Encoding = DXC_CP_UTF8;//UTF8の文字コードであることを通知
+
+
+	LPCWSTR arguments[] = {
+		combinedPath.c_str(),//コンパイル対象のhlslファイル名
+		L"-E",L"main",//エントリーポイントの指定。基本的にmain以外にはしない
+		L"-T",profile,//ShaderProfileの設定
+		L"-Zi",L"-Qembed_debug",//デバッグ用の情報を埋め込む
+		L"-Od",//最適化を外しておく
+		L"-Zpr",//メモリレイアウトは行優先
+	};
+	//実際にShaderをコンパイルする
+	IDxcResult* shaderResult = nullptr;
+	hr = dxcCompiler_->Compile(
+		&shaderSourceBuffer,//読み込んだファイル
+		arguments,//コンパイルオプション
+		_countof(arguments),//コンパイルオプションの数
+		includeHandler_.Get(),//includeが含まれた諸々
+		IID_PPV_ARGS(&shaderResult)//コンパイル結果
+	);
+	//コンパイルエラーではなくdxcが起動できないほど致命的な状況
+	assert(SUCCEEDED(hr));
+
+
+	//警告・エラーが出てたらログに出して止める
+	IDxcBlobUtf8* shaderError = nullptr;
+	shaderResult->GetOutput(DXC_OUT_ERRORS, IID_PPV_ARGS(&shaderError), _In_opt_ nullptr);
+	if (shaderError != nullptr && shaderError->GetStringLength() != 0) {
+		Log(shaderError->GetStringPointer());
+		//警告・エラーダメゼッタイ
+		assert(false);
+	}
+
+
+	//コンパイル結果から実行用のバイナリ部分を取得
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = nullptr;
+	hr = shaderResult->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&shaderBlob), nullptr);
+	assert(SUCCEEDED(hr));
+	//成功したログを出す
+	Log(ConvertString(std::format(L"Compile Succeeded, path:{}, profile:{}\n", combinedPath, profile)));
+	//もう使わないリソースを解放
+	shaderSource->Release();
+	shaderResult->Release();
+
+	//実行用のバイナリを返却
+	return shaderBlob;
+}
+
+void Renderer::InitializeDXC() {
+	//dxccompilerを初期化
+	HRESULT hr = DxcCreateInstance(CLSID_DxcUtils, IID_PPV_ARGS(&dxcUtils_));
+	assert(SUCCEEDED(hr));
+
+	hr = DxcCreateInstance(CLSID_DxcCompiler, IID_PPV_ARGS(&dxcCompiler_));
+	assert(SUCCEEDED(hr));
+
+	//現時点ではincludeはしないが、includeに対応するための設定を行っておく
+	hr = dxcUtils_->CreateDefaultIncludeHandler(&includeHandler_);
+	assert(SUCCEEDED(hr));
+}
+
 void Renderer::CreateModelPipelineState() {
 	//生成
 	modelRootSignature_ = std::make_unique<RootSignature>();
@@ -203,10 +277,10 @@ void Renderer::CreateModelPipelineState() {
 
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = shaderCompiler_->CompileShader(L"Object3d.VS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"Object3d.VS.hlsl", L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = shaderCompiler_->CompileShader(L"Object3d.PS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"Object3d.PS.hlsl", L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
 
 
@@ -389,10 +463,10 @@ void Renderer::CreateSpritePipelineState() {
 
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = shaderCompiler_->CompileShader(L"SpriteVS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"SpriteVS.hlsl", L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = shaderCompiler_->CompileShader(L"SpritePS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"SpritePS.hlsl", L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
 
 
@@ -526,10 +600,10 @@ void Renderer::CreateParticlePipelineState() {
 
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = shaderCompiler_->CompileShader(L"Particle.VS.hlsl", L"vs_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"Particle.VS.hlsl", L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = shaderCompiler_->CompileShader(L"Particle.PS.hlsl", L"ps_6_0");
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"Particle.PS.hlsl", L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
 
 

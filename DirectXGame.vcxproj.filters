@@ -220,6 +220,12 @@
     <Filter Include="ヘッダー ファイル\Engine\Base\ShaderCompiler">
       <UniqueIdentifier>{e62befce-5628-49d7-b758-7e3d71048266}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Engine\Components\PostEffects">
+      <UniqueIdentifier>{55155ba1-4856-462b-81f7-c33d9f639500}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Engine\Components\PostEffects">
+      <UniqueIdentifier>{e7bf965d-58b9-4174-bf4f-56b7e25836cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -369,8 +375,11 @@
     <ClCompile Include="Engine\Base\PipelineState\PipelineState.cpp">
       <Filter>ソース ファイル\Engine\Base\PipelineState</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Base\ShaderCompiler\ShaderCompiler.cpp">
-      <Filter>ソース ファイル\Engine\Base\ShaderCompiler</Filter>
+    <ClCompile Include="Engine\Components\PostEffects\PostEffects.cpp">
+      <Filter>ソース ファイル\Engine\Components\PostEffects</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\PostEffects\GaussianBlur.cpp">
+      <Filter>ソース ファイル\Engine\Components\PostEffects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -557,8 +566,11 @@
     <ClInclude Include="Engine\Base\PipelineState\PipelineState.h">
       <Filter>ヘッダー ファイル\Engine\Base\PipelineState</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Base\ShaderCompiler\ShaderCompiler.h">
-      <Filter>ヘッダー ファイル\Engine\Base\ShaderCompiler</Filter>
+    <ClInclude Include="Engine\Components\PostEffects\PostEffects.h">
+      <Filter>ヘッダー ファイル\Engine\Components\PostEffects</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\PostEffects\GaussianBlur.h">
+      <Filter>ヘッダー ファイル\Engine\Components\PostEffects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

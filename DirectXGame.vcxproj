@@ -169,7 +169,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Base\PipelineState\PipelineState.cpp" />
     <ClCompile Include="Engine\Base\Renderer\Renderer.cpp" />
     <ClCompile Include="Engine\Base\RootSignature\RootSignature.cpp" />
-    <ClCompile Include="Engine\Base\ShaderCompiler\ShaderCompiler.cpp" />
     <ClCompile Include="Engine\Base\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Engine\Base\Windows\Application.cpp" />
     <ClCompile Include="Engine\Components\Audio\Audio.cpp" />
@@ -179,6 +178,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Components\Particle\Particle.cpp" />
     <ClCompile Include="Engine\Components\Particle\ParticleEmitter.cpp" />
     <ClCompile Include="Engine\Components\Particle\ParticleSystem.cpp" />
+    <ClCompile Include="Engine\Components\PostEffects\GaussianBlur.cpp" />
+    <ClCompile Include="Engine\Components\PostEffects\PostEffects.cpp" />
     <ClCompile Include="Engine\Externals\imgui\imgui.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MinSpace</Optimization>
     </ClCompile>
@@ -235,7 +236,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Base\PipelineState\PipelineState.h" />
     <ClInclude Include="Engine\Base\Renderer\Renderer.h" />
     <ClInclude Include="Engine\Base\RootSignature\RootSignature.h" />
-    <ClInclude Include="Engine\Base\ShaderCompiler\ShaderCompiler.h" />
     <ClInclude Include="Engine\Base\TextureManager\TextureManager.h" />
     <ClInclude Include="Engine\Base\Windows\Application.h" />
     <ClInclude Include="Engine\Components\Audio\Audio.h" />
@@ -247,6 +247,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Components\Particle\Particle.h" />
     <ClInclude Include="Engine\Components\Particle\ParticleEmitter.h" />
     <ClInclude Include="Engine\Components\Particle\ParticleSystem.h" />
+    <ClInclude Include="Engine\Components\PostEffects\GaussianBlur.h" />
+    <ClInclude Include="Engine\Components\PostEffects\PostEffects.h" />
     <ClInclude Include="Engine\Externals\imgui\imconfig.h" />
     <ClInclude Include="Engine\Externals\imgui\imgui.h" />
     <ClInclude Include="Engine\Externals\imgui\imgui_impl_dx12.h" />

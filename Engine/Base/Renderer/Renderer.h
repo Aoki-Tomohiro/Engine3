@@ -2,8 +2,9 @@
 #include "Engine/Base/Graphics/GraphicsCommon.h"
 #include "Engine/Base/TextureManager/TextureManager.h"
 #include "Engine/Base/PipelineState/PipelineState.h"
-#include "Engine/Base/ShaderCompiler/ShaderCompiler.h"
+#include <dxcapi.h>
 #include <vector>
+#pragma comment(lib,"dxcompiler.lib")
 
 class Renderer {
 public:
@@ -94,11 +95,27 @@ public:
 	/// </summary>
 	void PostDrawParticles();
 
+	/// <summary>
+	/// シェーダー読み込み
+	/// </summary>
+	/// <param name="filePath"></param>
+	/// <param name="profile"></param>
+	/// <returns></returns>
+	Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(const std::wstring& filePath, const wchar_t* profile);
+
 private:
 	Renderer() = default;
 	~Renderer() = default;
 	Renderer(const Renderer&) = delete;
 	Renderer& operator=(const Renderer&) = delete;
+
+	//ディレクトリパス
+	static const std::wstring& kBaseDirectory;
+
+	/// <summary>
+	/// DXCの初期化
+	/// </summary>
+	void InitializeDXC();
 
 	/// <summary>
 	/// モデル用のPSOを作成
@@ -120,9 +137,11 @@ private:
 	static Renderer* instance_;
 	//GraphicsCommon
 	GraphicsCommon* graphicsCommon_ = nullptr;
-	//シェーダーコンパイラー
-	std::unique_ptr<ShaderCompiler> shaderCompiler_ = nullptr;
-	//ルートシグネチャ
+	//DXC
+	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_ = nullptr;
+	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_ = nullptr;
+	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_ = nullptr;
+	//RootSignature
 	std::unique_ptr<RootSignature> modelRootSignature_ = nullptr;
 	std::unique_ptr<RootSignature> spriteRootSignature_ = nullptr;
 	std::unique_ptr<RootSignature> particleRootSignature_ = nullptr;
