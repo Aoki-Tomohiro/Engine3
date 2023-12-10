@@ -51,10 +51,13 @@ private:
 private:
 	//インスタンス
 	static SceneManager* instance_;
+
 	//現在のシーン
 	IScene* currentScene_ = nullptr;
+
 	//次のシーン
 	IScene* nextScene_ = nullptr;
+
 	//シーンファクトリー
 	AbstractSceneFactory* sceneFactory_ = nullptr;
 };

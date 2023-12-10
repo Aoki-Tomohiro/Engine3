@@ -47,22 +47,31 @@ public:
 protected:
 	//リークチェッカー
 	D3DResourceLeakChecker leakChecker_{};
+
 	//WindowsApplication
 	Application* app_ = nullptr;
+
 	//GraphicsCommon
 	GraphicsCommon* graphicsCommon_ = nullptr;
+
 	//テクスチャマネージャー
 	TextureManager* textureManager_ = nullptr;
+
 	//ImGuiManager
 	ImGuiManager* imguiManager_ = nullptr;
+
 	//Renderer
 	Renderer* renderer_ = nullptr;
+
 	//Input
 	Input* input_ = nullptr;
+
 	//Audio
 	Audio* audio_ = nullptr;
+
 	//シーンマネージャー
 	SceneManager* sceneManager_ = nullptr;
+
 	//シーンファクトリー
 	std::unique_ptr<AbstractSceneFactory> sceneFactory_ = nullptr;
 };
