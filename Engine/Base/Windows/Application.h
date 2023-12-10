@@ -66,8 +66,10 @@ private:
 private:
 	//ウィンドウクラス
 	WNDCLASS wc_{};
+
 	//ウィンドウサイズ
 	RECT wrc_{};
+
 	//ウィンドウハンドル
 	HWND hwnd_{};
 };

@@ -65,7 +65,7 @@ public:
 	/// <param name="kNumInstance"></param>
 	/// <param name="size"></param>
 	/// <returns></returns>
-	D3D12_GPU_DESCRIPTOR_HANDLE CreateInstancingShaderResourceView(UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size);
+	uint32_t CreateInstancingShaderResourceView(const std::string& name, UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size);
 
 	/// <summary>
 	/// テクスチャの情報を取得
@@ -105,14 +105,19 @@ private:
 private:
 	//インスタンス
 	static TextureManager* instance;
+
 	//デバイス
 	ID3D12Device* device_ = nullptr;
+
 	//コマンドリスト
 	ID3D12GraphicsCommandList* commandList_ = nullptr;
+
 	//ディスクリプタヒープ
 	std::unique_ptr<SRVHeap> srvDescriptorHeap_ = nullptr;
+
 	//テクスチャの配列
 	std::array<Texture, kNumDescriptors> textures_{};
+
 	//テクスチャ番号
 	uint32_t textureHandle_ = -1;
 };

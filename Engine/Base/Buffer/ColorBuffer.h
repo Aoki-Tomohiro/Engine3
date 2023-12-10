@@ -71,9 +71,13 @@ public:
 private:
 	//RTVハンドル
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_;
-	//SRVハンドル
+
+	//SRVCpuハンドル
 	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle_;
+
+	//SRVGpuハンドル
 	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle_;
+
 	//クリアカラー
 	float clearColor_[4];
 };

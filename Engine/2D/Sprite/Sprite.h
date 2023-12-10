@@ -254,53 +254,82 @@ private:
 private:
 	//デバイス
 	static ID3D12Device* sDevice_;
+
 	//コマンドリスト
 	static ID3D12GraphicsCommandList* sCommandList_;
+
 	//射影行列
 	static Matrix4x4 sMatProjection_;
+
 	//頂点バッファ
 	std::unique_ptr<UploadBuffer> vertexBuffer_ = nullptr;
+
+	//書き込み用
 	VertexData* vertexData_ = nullptr;
+
 	//マテリアル用のリソース
 	std::unique_ptr<UploadBuffer> materialResource_ = nullptr;
+
+	//書き込み用
 	MaterialData* materialData_ = nullptr;
+
 	//WVP用のリソース
 	std::unique_ptr<UploadBuffer> wvpResource_ = nullptr;
+
+	//書き込み用
 	Matrix4x4* wvpData_ = nullptr;
+
 	//頂点データ
 	std::array<VertexData, kMaxVertices> vertices_{};
+
 	//頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+
 	//テクスチャの情報
 	D3D12_RESOURCE_DESC resourceDesc_{};
+
 	//座標
 	Vector2 position_ = { 0.0f,0.0f };
+
 	//回転
 	float rotation_ = 0.0f;
+
 	//スケール
 	Vector2 scale_ = { 1.0f,1.0f };
+
 	//色
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+
 	//サイズ
 	Vector2 size_ = { 100.0f,100.0f };
+
 	//アンカーポイント
 	Vector2 anchorPoint_{ 0.0f,0.0f };
+
 	//左右フリップ
 	bool isFlipX_ = false;
+
 	//上下フリップ
 	bool isFlipY_ = false;
+
 	//非表示フラグ
 	bool isInvisible_ = false;
+
 	//テクスチャ左上座標
 	Vector2 textureLeftTop_ = { 0.0f,0.0f };
+
 	//テクスチャ切り出しサイズ
 	Vector2 textureSize_ = { 100.0f,100.0f };
+
 	//uv座標
 	Vector2 uvTranslation_ = { 0.0f,0.0f };
+
 	//uv角度
 	float uvRotation_ = 0.0f;
+
 	//uvスケール
 	Vector2 uvScale_ = { 1.0f,1.0f };
+
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0;
 };

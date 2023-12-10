@@ -31,8 +31,10 @@ public:
 protected:
 	//デバイス
 	ID3D12Device* device_ = nullptr;
+
 	//リソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource_ = nullptr;
+
 	//リソースの状態
 	D3D12_RESOURCE_STATES resourceState_{};
 };

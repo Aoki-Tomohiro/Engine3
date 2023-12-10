@@ -88,12 +88,16 @@ public:
 private:
 	//衝突半径
 	float radius_ = 1.0f;
+
 	//AABB
 	AABB aabb_{ {-1.0f,-1.0f,-1.0f},{1.0f,1.0f,1.0f} };
+
 	//衝突属性(自分)
 	uint32_t collisionAttribute_ = 0xffffffff;
+
 	//衝突マスク(相手)
 	uint32_t collisionMask_ = 0xffffffff;
+
 	//形状(デフォルトは球に設定)
 	uint32_t collisionPrimitive_ = kCollisionPrimitiveSphere;
 };

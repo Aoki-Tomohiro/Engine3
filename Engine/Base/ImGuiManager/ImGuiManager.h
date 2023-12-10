@@ -48,8 +48,10 @@ private:
 private:
 	//ウィンドウズアプリケーション
 	Application* app_ = nullptr;
+
 	//DirectXCommon
 	GraphicsCommon* graphicsCommon_ = nullptr;
+
 	//SRV用ヒープ
 	std::unique_ptr<SRVHeap> srvDescriptorHeap_ = nullptr;
 };

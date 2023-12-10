@@ -94,14 +94,19 @@ private:
 private:
 	//コマンドリスト
 	static ID3D12GraphicsCommandList* sCommandList_;
+
 	//モデルデータ
 	static std::vector<ModelData> sModelDatas_;
+
 	//頂点データ
 	std::unique_ptr<Mesh> mesh_ = nullptr;
+
 	//マテリアルデータ
 	std::unique_ptr<Material> material_ = nullptr;
+
 	//DirectionalLight
 	std::unique_ptr<DirectionalLight> directionalLight_ = nullptr;
+
 	//テクスチャハンドル
 	uint32_t textureHandle_{};
 };

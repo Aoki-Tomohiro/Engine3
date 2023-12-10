@@ -130,31 +130,49 @@ private:
 private:
 	//インスタンス
 	static GraphicsCommon* instance;
+
 	//ウィンドウズアプリケーション
 	Application* app_ = nullptr;
+
 	//DXGIファクトリー
 	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
+
 	//アダプタ
 	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_ = nullptr;
+
 	//デバイス
 	Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
+
 	//コマンドキュー
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_ = nullptr;
+
 	//コマンドアロケーター
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
+
 	//コマンドリスト
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
+
 	//スワップチェーン
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
+
 	//フェンス
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
+
+	//フェンスの値
 	uint64_t fenceValue_{};
-	//ディスクリプタヒープ
+
+	//RTV用のヒープ
 	std::unique_ptr<RTVHeap> rtvDescriptorHeap_ = nullptr;
+
+	//DSV用のヒープ
 	std::unique_ptr<DSVHeap> dsvDescriptorHeap_ = nullptr;
-	//リソース
+
+	//スワップチェーン用のリソース
 	std::unique_ptr<ColorBuffer> swapChainResource_[2] = { nullptr };
+
+	//深度用のリソース
 	std::unique_ptr<DepthBuffer> depthStencilResource_ = nullptr;
+
 	//記録時間(FPS固定用)
 	std::chrono::steady_clock::time_point reference_{};
 };

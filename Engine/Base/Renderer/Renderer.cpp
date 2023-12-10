@@ -23,28 +23,12 @@ void Renderer::Initialize() {
 	//DXCの初期化
 	InitializeDXC();
 
-	//DescriptorHeapの作成
-	ID3D12Device* device = graphicsCommon_->GetDevice();
-	rtvHeap_ = std::make_unique<RTVHeap>();
-	rtvHeap_->Create(10);
-	srvHeap_ = std::make_unique<SRVHeap>();
-	srvHeap_->Create(10);
-	dsvHeap_ = std::make_unique<DSVHeap>();
-	dsvHeap_->Create(1);
-
 	//リソースの作成
 	float clearColor[] = { 0.1f,0.25f,0.5f,1.0f };
 	sceneColorBuffer_ = std::make_unique<ColorBuffer>();
 	sceneColorBuffer_->Create(Application::kClientWidth, Application::kClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, clearColor);
 	sceneDepthBuffer_ = std::make_unique<DepthBuffer>();
 	sceneDepthBuffer_->Create(Application::GetInstance()->kClientWidth, Application::GetInstance()->kClientHeight, DXGI_FORMAT_D24_UNORM_S8_UINT);
-
-	//RTVの作成
-	rtvHeap_->CreateRenderTargetView(*sceneColorBuffer_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-	//SRVの作成
-	srvHeap_->CreateShaderResourceView(*sceneColorBuffer_, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
-	//DSVの作成
-	dsvHeap_->CreateDepthStencilView(*sceneDepthBuffer_, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
 	//モデル用のPSOの作成
 	CreateModelPipelineState();

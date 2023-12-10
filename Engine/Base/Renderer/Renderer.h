@@ -135,25 +135,33 @@ private:
 private:
 	//インスタンス
 	static Renderer* instance_;
+
 	//GraphicsCommon
 	GraphicsCommon* graphicsCommon_ = nullptr;
-	//DXC
+
+	//DXCCompiler
 	Microsoft::WRL::ComPtr<IDxcUtils> dxcUtils_ = nullptr;
+
 	Microsoft::WRL::ComPtr<IDxcCompiler3> dxcCompiler_ = nullptr;
+
 	Microsoft::WRL::ComPtr<IDxcIncludeHandler> includeHandler_ = nullptr;
+
 	//RootSignature
 	std::unique_ptr<RootSignature> modelRootSignature_ = nullptr;
+
 	std::unique_ptr<RootSignature> spriteRootSignature_ = nullptr;
+
 	std::unique_ptr<RootSignature> particleRootSignature_ = nullptr;
+
 	//PipelineState
 	std::vector<std::unique_ptr<PipelineState>> modelPipelineStates_{};
+
 	std::vector<std::unique_ptr<PipelineState>> spritePipelineStates_{};
+
 	std::vector<std::unique_ptr<PipelineState>> particlePipelineStates_{};
+
 	//Resource
 	std::unique_ptr<ColorBuffer> sceneColorBuffer_ = nullptr;
+
 	std::unique_ptr<DepthBuffer> sceneDepthBuffer_ = nullptr;
-	//Heap
-	std::unique_ptr<RTVHeap> rtvHeap_ = nullptr;
-	std::unique_ptr<SRVHeap> srvHeap_ = nullptr;
-	std::unique_ptr<DSVHeap> dsvHeap_ = nullptr;
 };

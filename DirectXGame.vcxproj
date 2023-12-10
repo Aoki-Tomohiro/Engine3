@@ -178,8 +178,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Engine\Components\Particle\Particle.cpp" />
     <ClCompile Include="Engine\Components\Particle\ParticleEmitter.cpp" />
     <ClCompile Include="Engine\Components\Particle\ParticleSystem.cpp" />
-    <ClCompile Include="Engine\Components\PostEffects\GaussianBlur.cpp" />
-    <ClCompile Include="Engine\Components\PostEffects\PostEffects.cpp" />
     <ClCompile Include="Engine\Externals\imgui\imgui.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MinSpace</Optimization>
     </ClCompile>
@@ -247,8 +245,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Engine\Components\Particle\Particle.h" />
     <ClInclude Include="Engine\Components\Particle\ParticleEmitter.h" />
     <ClInclude Include="Engine\Components\Particle\ParticleSystem.h" />
-    <ClInclude Include="Engine\Components\PostEffects\GaussianBlur.h" />
-    <ClInclude Include="Engine\Components\PostEffects\PostEffects.h" />
     <ClInclude Include="Engine\Externals\imgui\imconfig.h" />
     <ClInclude Include="Engine\Externals\imgui\imgui.h" />
     <ClInclude Include="Engine\Externals\imgui\imgui_impl_dx12.h" />

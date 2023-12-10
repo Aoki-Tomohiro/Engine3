@@ -86,7 +86,10 @@ public:
 	ID3D12PipelineState* GetPipelineState() const { return pipelineState_.Get(); };
 
 private:
+	//パイプラインステート
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState_ = nullptr;
+
+	//パイプラインの設定
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineStateDesc_{};
 };
 

@@ -139,22 +139,31 @@ private:
 private:
 	//WindowsAPI
 	Application* app_ = nullptr;
+
 	//DirectInput
 	ComPtr<IDirectInput8> directInput_ = nullptr;
+
 	//KeyboardDevice
 	ComPtr<IDirectInputDevice8> keyboardDevice_ = nullptr;
+
 	//MouseDevice
 	ComPtr<IDirectInputDevice8> mouseDevice_ = nullptr;
+
 	//キー情報
 	BYTE key_[256] = {};
+
 	//前フレームのキー情報
 	BYTE preKey_[256] = {};
+
 	//マウスの情報
 	DIMOUSESTATE mouse_ = {};
+
 	//前のフレームのマウスの情報
 	DIMOUSESTATE mousePre_ = {};
+
 	//コントローラーの情報
 	XINPUT_STATE state_{};
+
 	//前のフレームのコントローラーの情報
 	XINPUT_STATE preState_{};
 };

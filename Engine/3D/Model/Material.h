@@ -80,14 +80,19 @@ public:
 private:
 	//マテリアル用のリソース
 	std::unique_ptr<UploadBuffer> materialResource_ = nullptr;
+
 	//書き込み用
 	ConstBufferDataMaterial* materialData_ = nullptr;
+
 	//色
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+
 	//uv座標
 	Vector2 translation_{ 0.0f,0.0f };
+
 	//uv角度
 	float rotation_ = 0.0f;
+
 	//uvスケール
 	Vector2 scale_{ 1.0f,1.0f };
 };

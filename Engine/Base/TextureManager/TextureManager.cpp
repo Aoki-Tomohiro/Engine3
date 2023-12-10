@@ -50,7 +50,14 @@ void TextureManager::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, uin
 	commandList_->SetGraphicsRootDescriptorTable(rootParameterIndex, textures_[textureHandle].resource->GetSRVGpuHandle());
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::CreateInstancingShaderResourceView(UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size) {
+uint32_t TextureManager::CreateInstancingShaderResourceView(const std::string& name, UploadBuffer& instancingResource, uint32_t kNumInstance, size_t size) {
+	//同じリソースがないか探す
+	for (const Texture& texture : textures_) {
+		if (texture.name == name) {
+			return texture.textureHandle;
+		}
+	}
+
 	//テクスチャハンドルをインクリメント
 	textureHandle_++;
 	//テクスチャがディスクリプタの最大数を超えていたら止める
@@ -58,8 +65,9 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::CreateInstancingShaderResourceView(U
 		assert(0);
 	}
 	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGpu = srvDescriptorHeap_->CreateInstancingShaderResourceView(instancingResource, kNumInstance, size);
-	textures_[textureHandle_].name = "instancingResource";
-	return srvHandleGpu;
+	textures_[textureHandle_].name = name;
+	textures_[textureHandle_].textureHandle = textureHandle_;
+	return textureHandle_;
 }
 
 const D3D12_RESOURCE_DESC TextureManager::GetResourceDesc(uint32_t textureHandle) {

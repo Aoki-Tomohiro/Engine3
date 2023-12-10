@@ -29,8 +29,10 @@ public:
 private:
 	//RootSignature
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
+
 	//RootParameter
 	std::vector<D3D12_ROOT_PARAMETER> rootParameters_{};
+
 	//Sampler
 	std::vector<D3D12_STATIC_SAMPLER_DESC> staticSamplers_{};
 };

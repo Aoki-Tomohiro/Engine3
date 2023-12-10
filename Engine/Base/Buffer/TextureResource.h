@@ -49,8 +49,10 @@ public:
 private:
 	//リソースの設定
 	D3D12_RESOURCE_DESC resourceDesc_{};
+
 	//CpuHandle
 	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle_{};
+
 	//GpuHandle
 	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle_{};
 };

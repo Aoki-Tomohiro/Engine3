@@ -57,20 +57,28 @@ public:
 protected:
 	//座標
 	Vector3 translation_{};
+
 	//回転
 	Vector3 rotation_{};
+
 	//スケール
 	Vector3 scale_{};
+
 	//速度
 	Vector3 velocity_{};
+
 	//色
 	Vector4 color_{};
+
 	//寿命
 	float lifeTime_ = 0.0f;
+
 	//経過時間
 	float currentTime_ = 0.0f;
+
 	//死亡フラグ
 	bool isDead_ = false;
+
 	//アルファ値
 	float alpha_ = 0.0f;
 };

@@ -114,10 +114,21 @@ private:
 	const Audio& operator = (const Audio&) = delete;
 
 private:
+	//XAudio
 	ComPtr<IXAudio2> xAudio2_ = nullptr;
+
+	//マスターボイス
 	IXAudio2MasteringVoice* masterVoice_ = nullptr;
+
+	//サウンドデータ
 	std::array<SoundData, kMaxSoundData> soundDatas_{};
+
+	//ボイスデータ
 	std::set<Voice*> sourceVoices_{};
+
+	//オーディオハンドル
 	uint32_t audioHandle_ = -1;
+
+	//ボイスハンドル
 	uint32_t voiceHandle_ = -1;
 };

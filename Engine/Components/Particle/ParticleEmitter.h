@@ -105,38 +105,55 @@ private:
 private:
 	//パーティクルのリスト
 	std::list<std::unique_ptr<Particle>> particles_{};
+
 	//エミッターの名前
 	std::string name_ = "nameless";
+
 	//パーティクルの発生位置
 	Vector3 popTranslation_ = { 0.0f,0.0f,0.0f };
+
 	//パーティクルの発生範囲
 	minmaxStructVector3 popArea_ = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
 	//パーティクルの角度
 	minmaxStructVector3 popRotation_ = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
 	//パーティクルのスケール
 	minmaxStructVector3 popScale_ = { {1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f} };
+
 	//パーティクルの方位角
 	minmaxStructFloat popAzimuth = { 0.0f,360.0f };
+
 	//パーティクルの仰角
 	minmaxStructFloat popElevation = { 0.0f,180.0f };
+
 	//パーティクルの初速度
 	minmaxStructVector3 popVelocity_ = { {1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f} };
+
 	//パーティクルの色
 	minmaxStructVector4 popColor_ = { {1.0f,1.0f,1.0f,1.0f},{1.0f,1.0f,1.0f,1.0f} };
+
 	//パーティクルの寿命
 	minmaxStructFloat popLifeTime_ = { 0.5f,1.0f };
+
 	//発生数
 	uint32_t popCount_ = 1;
+
 	//発生頻度
 	float popFrequency_ = 0.1f;
+
 	//頻度用時刻
 	float frequencyTime_ = popFrequency_;
+
 	//エミッターの寿命
 	float deleteTime_ = 10.0f;
+
 	//寿命用のタイマー
 	float deleteTimer_ = 0.0f;
+
 	//死亡フラグ
 	bool isDead_ = false;
+
 	//Builderをフレンドクラスに設定
 	friend class EmitterBuilder;
 };

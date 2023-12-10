@@ -110,16 +110,22 @@ public:
 private:
 	//ライティング用のリソース
 	std::unique_ptr<UploadBuffer> lightingResource_ = nullptr;
+
 	//書き込み用
 	ConstBufferDataDirectionalLight* directionalLightData_ = nullptr;
+
 	//ライティングのフラグ
 	int32_t enableLighting_ = true;
+
 	//ライティング方式
 	LightingMethod lightingMethod_ = LightingMethod::HalfLambert;
+
 	//ライトの色
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+
 	//ライトの向き
 	Vector3 direction_ = { 0.0f,-1.0f,0.0f };
+
 	//輝度
 	float intensity_ = 1.0f;
 };

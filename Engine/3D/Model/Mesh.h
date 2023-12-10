@@ -35,10 +35,13 @@ public:
 private:
 	//VertexBuffer
 	std::unique_ptr<UploadBuffer> vertexBuffer_ = nullptr;
+
 	//書き込み用
 	VertexData* vertexData_ = nullptr;
+
 	//VertexBufferView
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+
 	//頂点データ
 	std::vector<VertexData> vertices_{};
 };

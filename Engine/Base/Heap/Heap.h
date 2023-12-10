@@ -45,10 +45,13 @@ private:
 protected:
 	//デバイス
 	ID3D12Device* device_ = nullptr;
+
 	//ディスクリプタヒープ
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_ = nullptr;
+
 	//ディスクリプタの最大数
 	uint32_t numDescriptors_ = 0;
+
 	//インデックス
 	uint32_t index_ = -1;
 };

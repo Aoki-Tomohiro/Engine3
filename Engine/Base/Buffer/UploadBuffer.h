@@ -40,6 +40,7 @@ public:
 private:
 	//サイズ
 	size_t bufferSize_ = 0;
+
 	//マップされたデータ
 	void* mappedData_ = nullptr;
 };

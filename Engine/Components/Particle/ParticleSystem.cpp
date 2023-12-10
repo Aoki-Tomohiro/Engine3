@@ -11,7 +11,7 @@ void ParticleSystem::StaticInitialize() {
 	sCommandList_ = GraphicsCommon::GetInstance()->GetCommandList();
 }
 
-void ParticleSystem::Initialize() {
+void ParticleSystem::Initialize(const std::string& name) {
 	//頂点データの作成
 	vertices_.push_back({ .position{1.0f, 1.0f, 0.0f, 1.0f }, .texcoord{ 0.0f, 0.0f }, .normal{ 0.0f, 0.0f, 1.0f } }); // 左上
 	vertices_.push_back({ .position{-1.0f, 1.0f, 0.0f, 1.0f }, .texcoord{ 1.0f, 0.0f }, .normal{ 0.0f, 0.0f, 1.0f } }); // 左下
@@ -36,8 +36,9 @@ void ParticleSystem::Initialize() {
 
 	//インスタンシング用のリソースの作成
 	CreateInstancingResource();
+
 	//SRVの作成
-	srvHandleGpu_ = TextureManager::GetInstance()->CreateInstancingShaderResourceView(*instancingResource_.get(), kMaxInstance, sizeof(ParticleForGPU));
+	srvIndex_ = TextureManager::GetInstance()->CreateInstancingShaderResourceView(name, *instancingResource_.get(), kMaxInstance, sizeof(ParticleForGPU));
 
 	//テクスチャの読み込み
 	textureHandle_ = TextureManager::Load("Resources/Images/circle.png");
@@ -73,7 +74,7 @@ void ParticleSystem::Draw(const Camera& camera) {
 	//マテリアルCBufferの場所を設定
 	sCommandList_->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//WorldTransform用のCBufferの場所を設定
-	sCommandList_->SetGraphicsRootDescriptorTable(1, srvHandleGpu_);
+	TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(1, srvIndex_);
 	//ViewProjection用のCBufferの場所を設定
 	sCommandList_->SetGraphicsRootConstantBufferView(2, camera.GetConstantBuffer()->GetGPUVirtualAddress());
 	//DescriptorTableを設定

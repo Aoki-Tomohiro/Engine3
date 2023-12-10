@@ -36,7 +36,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize();
+	void Initialize(const std::string& name);
 
 	/// <summary>
 	/// 更新
@@ -99,27 +99,42 @@ private:
 private:
 	//インスタンス
 	static ParticleSystem* instance_;
+
 	//コマンドリスト
 	static ID3D12GraphicsCommandList* sCommandList_;
+
 	//Instancing用のWorldTransform
 	std::unique_ptr<UploadBuffer> instancingResource_ = nullptr;
+
 	ParticleForGPU* instancingData_ = nullptr;
+
 	//頂点バッファ
 	std::unique_ptr<UploadBuffer> vertexBuffer_ = nullptr;
+
+	//書き込み用
 	VertexData* vertexData_ = nullptr;
+
 	//マテリアル用のリソース
 	std::unique_ptr<UploadBuffer> materialResource_ = nullptr;
+
+	//書き込み用
 	MaterialData* materialData_ = nullptr;
+
 	//頂点データ
 	std::vector<VertexData> vertices_{};
+
 	//頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+
 	//Instancing用のSRVの番号
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHandleGpu_{};
+	uint32_t srvIndex_ = 0;
+
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0;
+
 	//エミッターのリスト
 	std::list<std::unique_ptr<ParticleEmitter>> particleEmitters_{};
+
 	//インスタンス数
 	uint32_t numInstance_ = 0;
 };
